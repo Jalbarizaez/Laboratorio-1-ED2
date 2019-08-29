@@ -36,7 +36,7 @@ namespace Laboratorio_1.Models
             {
                 if (Tabla_Frecuencias.Keys.Contains(Caracter))
                 {
-                    Tabla_Frecuencias[Caracter] = Tabla_Frecuencias[Caracter]++;
+                    Tabla_Frecuencias[Caracter] = Tabla_Frecuencias[Caracter] + 1;
                 }
                 else Tabla_Frecuencias.Add(Caracter, 1);
             }
@@ -45,13 +45,15 @@ namespace Laboratorio_1.Models
             {
                 Lista_Frecuencias.Add(new NodoHuff(Nodos.Key, (Convert.ToDouble(Nodos.Value) / Cantidad_Datos)));
             }
-            while(Lista_Frecuencias.Count >1)
+            while (Lista_Frecuencias.Count >1)
             {
-                Lista_Frecuencias.OrderBy(x => x.Probabilidad);
-                NodoHuff Union = Unir_Nodos(Lista_Frecuencias[1], Lista_Frecuencias[0]);
+                Lista_Frecuencias = Lista_Frecuencias.OrderBy(x => x.Probabilidad).ToList();
+                NodoHuff Union = Unir_Nodos(Lista_Frecuencias[0], Lista_Frecuencias[1]);
                 Lista_Frecuencias.RemoveRange(0, 2);
+                Lista_Frecuencias.Add(Union);
             }
             Raiz = Lista_Frecuencias[0];
+
         }
     }
 }
