@@ -8,25 +8,25 @@ namespace Laboratorio_1.Models
     public class CompresionHuffman
     {
         private static NodoHuff Raiz { get; set; }
-        public static Dictionary<string,string> Tabla_Caracteres { get; set; }
-        public static int Tamaño_Datos { get; set; }
-        public static double Cantidad_Datos;
+        private static Dictionary<char,string> Tabla_Caracteres { get; set; }
+        private static int Tamaño_Datos { get; set; }
+        private static decimal Cantidad_Datos;
 
-        public static byte[] Compresion (string Dato)
+        public static void Compresion (string Dato)
         {
             
-            Tabla_Caracteres = new Dictionary<string, string>();
+            Tabla_Caracteres = new Dictionary<char, string>();
             ArbolHuffman(Dato);
 
         }
-        public static NodoHuff Unir_Nodos(NodoHuff Mayor, NodoHuff Menor)
+        private static NodoHuff Unir_Nodos(NodoHuff Mayor, NodoHuff Menor)
         {
             NodoHuff Padre = new NodoHuff('`',Mayor.Probabilidad+Menor.Probabilidad);
             Padre.Izquierda = Mayor;
             Padre.Derecha = Menor;
             return Padre;
         }
-        static void ArbolHuffman(string Dato)
+        private static void ArbolHuffman(string Dato)
         {
             Dictionary<char, int> Tabla_Frecuencias = new Dictionary<char, int>();
             char[] Caracteres = Dato.ToCharArray();
@@ -43,7 +43,7 @@ namespace Laboratorio_1.Models
             List<NodoHuff> Lista_Frecuencias = new List<NodoHuff>();
             foreach(KeyValuePair<char,int> Nodos in Tabla_Frecuencias)
             {
-                Lista_Frecuencias.Add(new NodoHuff(Nodos.Key, (Convert.ToDouble(Nodos.Value) / Cantidad_Datos)));
+                Lista_Frecuencias.Add(new NodoHuff(Nodos.Key, (Convert.ToDecimal(Nodos.Value) / Cantidad_Datos)));
             }
             while (Lista_Frecuencias.Count >1)
             {
@@ -53,7 +53,21 @@ namespace Laboratorio_1.Models
                 Lista_Frecuencias.Add(Union);
             }
             Raiz = Lista_Frecuencias[0];
-
+           
+        }
+        private static void Codigos_Prefijo(NodoHuff Nodo, string recorrido)
+        {
+            if (Nodo.Hoja()) Tabla_Caracteres.Add(Nodo.Dato, recorrido);
+            else
+            {
+                if (Nodo.Izquierda != null) Codigos_Prefijo(Nodo.Izquierda, recorrido + "0");
+                if (Nodo.Derecha != null) Codigos_Prefijo(Nodo.Derecha, recorrido + "1");
+            }
+        }
+        private static void Obtener_Codigos_Prefijo()
+        {
+            if (Raiz.Hoja()) Tabla_Caracteres.Add(Raiz.Dato, "1");
+            else Codigos_Prefijo(Raiz, "");
         }
     }
 }

@@ -8,12 +8,12 @@ namespace Laboratorio_1.Models
     public class NodoHuff
     {
         public char Dato { get; set; }
-        public double Probabilidad { get; set; }
+        public decimal Probabilidad { get; set; }
         public NodoHuff Izquierda { get; set; }
         public NodoHuff Derecha { get; set; }
         public NodoHuff Padre { get; set; }
 
-        public NodoHuff (char dato, double probabilidad)
+        public NodoHuff (char dato, decimal probabilidad)
         {
             Dato = dato;
             Probabilidad = probabilidad;
@@ -21,7 +21,7 @@ namespace Laboratorio_1.Models
             Derecha = null;
             Padre = null;
         }
-        public bool HoJa()
+        public bool Hoja()
         {
             if (Derecha == null && Izquierda == null) return true;
             else return false;
