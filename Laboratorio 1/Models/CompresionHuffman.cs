@@ -69,5 +69,14 @@ namespace Laboratorio_1.Models
             if (Raiz.Hoja()) Tabla_Caracteres.Add(Raiz.Dato, "1");
             else Codigos_Prefijo(Raiz, "");
         }
+        private static void Recorrido(string Dato)
+        {
+            string recorrdio = "";
+            char[] recorrer = Dato.ToCharArray();
+            foreach (char Caracter in recorrer)
+            {
+                recorrdio += Tabla_Caracteres[Caracter];
+            }
+        }
     }
 }
