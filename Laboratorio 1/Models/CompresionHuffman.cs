@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Web;
 
@@ -12,11 +13,14 @@ namespace Laboratorio_1.Models
         private static int Tamaño_Datos { get; set; }
         private static decimal Cantidad_Datos;
 
-        public static void Compresion (string Dato)
+        public static void Compresion (string path)
         {
             
             Tabla_Caracteres = new Dictionary<char, string>();
-            ArbolHuffman(Dato);
+            ArbolHuffman(path);
+            Obtener_Codigos_Prefijo();
+            Escribir_Valor_Codigo_Prefijo(path);
+            
 
         }
         private static NodoHuff Unir_Nodos(NodoHuff Mayor, NodoHuff Menor)
@@ -76,6 +80,19 @@ namespace Laboratorio_1.Models
             foreach (char Caracter in recorrer)
             {
                 recorrdio += Tabla_Caracteres[Caracter];
+            }
+        }
+        private static void Escribir_Valor_Codigo_Prefijo(string path)
+        {
+            using (var file = new FileStream(path, FileMode.OpenOrCreate))
+            {
+                using (var writer = new StreamWriter(file))
+                {
+                    foreach (KeyValuePair<char, string> Valores in Tabla_Caracteres)
+                    {
+                        writer.Write(Valores.Key.ToString() + Valores.Value + "|");
+                    }
+                }
             }
         }
     }
