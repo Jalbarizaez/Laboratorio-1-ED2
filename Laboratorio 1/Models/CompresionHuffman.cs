@@ -25,7 +25,7 @@ namespace Laboratorio_1.Models
         }
         private static NodoHuff Unir_Nodos(NodoHuff Mayor, NodoHuff Menor)
         {
-            NodoHuff Padre = new NodoHuff('`',Mayor.Probabilidad+Menor.Probabilidad);
+            NodoHuff Padre = new NodoHuff(Mayor.Probabilidad+Menor.Probabilidad);
             Padre.Izquierda = Mayor;
             Padre.Derecha = Menor;
             return Padre;
@@ -92,6 +92,7 @@ namespace Laboratorio_1.Models
                     {
                         writer.Write(Valores.Key.ToString() + Valores.Value + "|");
                     }
+                    writer.Write("|");
                 }
             }
         }

@@ -21,6 +21,13 @@ namespace Laboratorio_1.Models
             Derecha = null;
             Padre = null;
         }
+        public NodoHuff(decimal probabilidad)
+        {
+            Probabilidad = probabilidad;
+            Izquierda = null;
+            Derecha = null;
+            Padre = null;
+        }
         public bool Hoja()
         {
             if (Derecha == null && Izquierda == null) return true;
