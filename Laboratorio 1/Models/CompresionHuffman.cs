@@ -8,18 +8,19 @@ namespace Laboratorio_1.Models
 {
     public class CompresionHuffman
     {
+        private const int bufferLenght = 100;
         private static NodoHuff Raiz { get; set; }
         private static Dictionary<char,string> Tabla_Caracteres { get; set; }
         private static int Tamaño_Datos { get; set; }
         private static decimal Cantidad_Datos;
 
-        public static void Compresion (string path)
+        public static void Compresion (string path_Lectura,string path_Escritura)
         {
             
             Tabla_Caracteres = new Dictionary<char, string>();
-            ArbolHuffman(path);
+            ArbolHuffman(path_Lectura);
             Obtener_Codigos_Prefijo();
-            Escribir_Valor_Codigo_Prefijo(path);
+            Escribir_Valor_Codigo_Prefijo(path_Escritura);
             
 
         }
@@ -30,19 +31,29 @@ namespace Laboratorio_1.Models
             Padre.Derecha = Menor;
             return Padre;
         }
-        private static void ArbolHuffman(string Dato)
+        private static void ArbolHuffman(string path)
         {
             Dictionary<char, int> Tabla_Frecuencias = new Dictionary<char, int>();
-            char[] Caracteres = Dato.ToCharArray();
-            Cantidad_Datos = Caracteres.Length;
-            Tamaño_Datos = Caracteres.Length;
-            foreach (char Caracter in Caracteres)
+            using (var File = new FileStream(path, FileMode.Open))
             {
-                if (Tabla_Frecuencias.Keys.Contains(Caracter))
+                var buffer = new byte[bufferLenght];
+                using (var reader = new BinaryReader(File))
                 {
-                    Tabla_Frecuencias[Caracter] = Tabla_Frecuencias[Caracter] + 1;
+                    while (reader.BaseStream.Position != reader.BaseStream.Length)
+                    {
+                        Cantidad_Datos++;
+                        buffer = reader.ReadBytes(bufferLenght);
+                        foreach (var item in buffer)
+                        {
+                            if (Tabla_Frecuencias.Keys.Contains(Convert.ToChar(item)))
+                            {
+                                Tabla_Frecuencias[Convert.ToChar(item)]++;
+                            }
+                            else Tabla_Frecuencias.Add(Convert.ToChar(Convert.ToChar(item)), 1);
+
+                        }
+                    }
                 }
-                else Tabla_Frecuencias.Add(Caracter, 1);
             }
             List<NodoHuff> Lista_Frecuencias = new List<NodoHuff>();
             foreach(KeyValuePair<char,int> Nodos in Tabla_Frecuencias)
