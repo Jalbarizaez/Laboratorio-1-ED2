@@ -10,17 +10,17 @@ namespace Laboratorio_1.Models
     {
         private const int bufferLenght = 100;
         private static NodoHuff Raiz { get; set; }
+        private static Dictionary<char, int> Tabla_Frecuencias { get; set; }
         private static Dictionary<char,string> Tabla_Caracteres { get; set; }
-        private static int Tamaño_Datos { get; set; }
         private static decimal Cantidad_Datos;
 
         public static void Compresion (string path_Lectura,string path_Escritura)
         {
-            
+            Tabla_Frecuencias = new Dictionary<char, int>();
             Tabla_Caracteres = new Dictionary<char, string>();
             ArbolHuffman(path_Lectura);
             Obtener_Codigos_Prefijo();
-            Escribir_Valor_Codigo_Prefijo(path_Escritura);
+            Escribir_Valor_y_Frecuencia(path_Escritura);
             
 
         }
@@ -39,9 +39,9 @@ namespace Laboratorio_1.Models
                 var buffer = new byte[bufferLenght];
                 using (var reader = new BinaryReader(File))
                 {
+                    Cantidad_Datos = reader.BaseStream.Length;
                     while (reader.BaseStream.Position != reader.BaseStream.Length)
                     {
-                        Cantidad_Datos++;
                         buffer = reader.ReadBytes(bufferLenght);
                         foreach (var item in buffer)
                         {
@@ -63,7 +63,7 @@ namespace Laboratorio_1.Models
             while (Lista_Frecuencias.Count >1)
             {
                 Lista_Frecuencias = Lista_Frecuencias.OrderBy(x => x.Probabilidad).ToList();
-                NodoHuff Union = Unir_Nodos(Lista_Frecuencias[0], Lista_Frecuencias[1]);
+                NodoHuff Union = Unir_Nodos(Lista_Frecuencias[1], Lista_Frecuencias[0]);
                 Lista_Frecuencias.RemoveRange(0, 2);
                 Lista_Frecuencias.Add(Union);
             }
@@ -93,13 +93,14 @@ namespace Laboratorio_1.Models
                 recorrdio += Tabla_Caracteres[Caracter];
             }
         }
-        private static void Escribir_Valor_Codigo_Prefijo(string path)
+        private static void Escribir_Valor_y_Frecuencia(string path)
         {
             using (var file = new FileStream(path, FileMode.OpenOrCreate))
             {
                 using (var writer = new StreamWriter(file))
                 {
-                    foreach (KeyValuePair<char, string> Valores in Tabla_Caracteres)
+                    writer.Write(Cantidad_Datos.ToString() + "|");
+                    foreach (KeyValuePair<char, int> Valores in Tabla_Frecuencias)
                     {
                         writer.Write(Valores.Key.ToString() + Valores.Value + "|");
                     }
