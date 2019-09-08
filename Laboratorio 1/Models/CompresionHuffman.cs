@@ -20,6 +20,7 @@ namespace Laboratorio_1.Models
             Tabla_Caracteres = new Dictionary<char, string>();
             ArbolHuffman(path_Lectura);
             Obtener_Codigos_Prefijo();
+            Recorrido(path_Lectura, path_Escritura);
             Escribir_Valor_y_Frecuencia(path_Escritura);
             
 
@@ -85,15 +86,52 @@ namespace Laboratorio_1.Models
             if (Raiz.Hoja()) Tabla_Caracteres.Add(Raiz.Dato, "1");
             else Codigos_Prefijo(Raiz, "");
         }
-        private static void Recorrido(string Dato)
+        private static void Recorrido(string path_Lectura, string path_Escritura)
         {
-            string recorrdio = "";
-            char[] recorrer = Dato.ToCharArray();
-            foreach (char Caracter in recorrer)
+            string recorrido = "";
+            using (var file = new FileStream(path_Escritura, FileMode.OpenOrCreate))
             {
-                recorrdio += Tabla_Caracteres[Caracter];
+                using (var File = new FileStream(path_Lectura, FileMode.Open))
+                {
+
+                    var buffer = new byte[bufferLenght];
+                    var Bytes = new List<byte>();
+                    using (var reader = new BinaryReader(File))
+                    {
+                        using (var writer = new BinaryWriter(file))
+                        {
+                            while (reader.BaseStream.Position != reader.BaseStream.Length)
+                            {
+
+                                buffer = reader.ReadBytes(bufferLenght);
+                                foreach (var item in buffer)
+                                {
+                                    recorrido += Tabla_Caracteres[Convert.ToChar(item)];
+                                    if (recorrido.Length >= 8)
+                                    {
+                                        while (recorrido.Length > 8)
+                                        {
+                                            Bytes.Add(Convert.ToByte(recorrido.Substring(0, 8), 2));
+                                            recorrido = recorrido.Remove(0, 8);
+                                        }
+                                    }
+                                }
+
+                                writer.Write(Bytes.ToArray());
+                                Bytes.Clear();
+                            }
+                            for (int i = recorrido.Length; i < 8; i++)
+                            {
+                                recorrido += "0";
+                            }
+                            writer.Write(Convert.ToByte(recorrido, 2));
+
+                        }
+                    }
+                }
             }
         }
+
         private static void Escribir_Valor_y_Frecuencia(string path)
         {
             using (var file = new FileStream(path, FileMode.OpenOrCreate))
