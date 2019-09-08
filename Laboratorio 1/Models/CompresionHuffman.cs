@@ -45,11 +45,12 @@ namespace Laboratorio_1.Models
                         buffer = reader.ReadBytes(bufferLenght);
                         foreach (var item in buffer)
                         {
-                            if (Tabla_Frecuencias.Keys.Contains(Convert.ToChar(item)))
-                            {
-                                Tabla_Frecuencias[Convert.ToChar(item)]++;
-                            }
-                            else Tabla_Frecuencias.Add(Convert.ToChar(Convert.ToChar(item)), 1);
+							//klj
+							if (Tabla_Frecuencias.Keys.Contains(Convert.ToChar(item)))
+							{
+								Tabla_Frecuencias[Convert.ToChar(item)]++;
+							}
+							else Tabla_Frecuencias.Add(Convert.ToChar(Convert.ToChar(item)), 1);
 
                         }
                     }
