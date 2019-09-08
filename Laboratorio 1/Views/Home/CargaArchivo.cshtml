@@ -1,0 +1,15 @@
+﻿@{
+    ViewBag.Title = "CargaArchivo";
+}
+
+<h1>Cargue su archivo para Comprimir</h1>
+<br />
+<h2 class="danger">@ViewBag.Error</h2>
+<h2 class="success">@ViewBag.Ok</h2>
+<br />
+<form method="post" enctype="multipart/form-data">
+	<input type="file" name="ArchivoEntrada" />
+	<br />
+	<button type="submit">Cargar</button>
+</form>
+

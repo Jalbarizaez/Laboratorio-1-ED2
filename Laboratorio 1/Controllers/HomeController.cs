@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using Laboratorio_1.Models;
 
 namespace Laboratorio_1.Controllers
 {
@@ -26,5 +27,33 @@ namespace Laboratorio_1.Controllers
 
             return View();
         }
-    }
+
+		CompresionHuffman H = new CompresionHuffman();
+
+		public ActionResult CargaArchivo()
+		{
+
+			return View();
+		}
+
+		[HttpPost]
+		public ActionResult CargaArchivo(HttpPostedFileBase ArchivoEntrada)
+		{
+			if (ArchivoEntrada != null)
+			{
+				string path = Server.MapPath("~/ArchivosTmp/");
+				path = path + ArchivoEntrada.FileName;
+				try
+				{
+					ArchivoEntrada.SaveAs(path);
+					ViewBag.Ok = "Iniciando Comprecion";
+				}
+				catch
+				{
+					ViewBag.Error = "Ha ocurrido un error con su archivo";
+				}
+			}
+			return View();
+		}
+	}
 }
