@@ -35,18 +35,20 @@ namespace Laboratorio_1.Controllers
 
 			return View();
 		}
-
 		[HttpPost]
 		public ActionResult CargaArchivo(HttpPostedFileBase ArchivoEntrada)
 		{
 			if (ArchivoEntrada != null)
 			{
 				string path = Server.MapPath("~/ArchivosTmp/");
+				string[] nombreArchivo = ArchivoEntrada.FileName.Split('.');
+				string pathPrueba = path + "_PRUEBA " + nombreArchivo[0] + ".huff";
 				path = path + ArchivoEntrada.FileName;
 				try
 				{
 					ArchivoEntrada.SaveAs(path);
-					ViewBag.Ok = "Iniciando Comprecion";
+					ViewBag.Ok = "Archivo Comprimido";
+					H.Compresion(path,(pathPrueba));
 				}
 				catch
 				{

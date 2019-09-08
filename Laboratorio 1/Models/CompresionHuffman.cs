@@ -14,7 +14,7 @@ namespace Laboratorio_1.Models
         private static Dictionary<char,string> Tabla_Caracteres { get; set; }
         private static decimal Cantidad_Datos;
 
-        public static void Compresion (string path_Lectura,string path_Escritura)
+        public void Compresion (string path_Lectura,string path_Escritura)
         {
             Tabla_Frecuencias = new Dictionary<char, int>();
             Tabla_Caracteres = new Dictionary<char, string>();
