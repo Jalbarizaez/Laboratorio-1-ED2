@@ -141,7 +141,7 @@ namespace Laboratorio_1.Models
                     writer.Write(Cantidad_Datos.ToString() + "|");
                     foreach (KeyValuePair<char, int> Valores in Tabla_Frecuencias)
                     {
-                        writer.Write(Valores.Key.ToString() + Valores.Value + "|");
+                        writer.Write(Valores.Key.ToString() + Valores.Value.ToString() + "|");
                     }
                     writer.Write("|");
                 }
