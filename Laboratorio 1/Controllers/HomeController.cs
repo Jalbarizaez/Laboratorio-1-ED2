@@ -4,6 +4,7 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using Laboratorio_1.Models;
+using System.IO;
 
 namespace Laboratorio_1.Controllers
 {
@@ -28,8 +29,14 @@ namespace Laboratorio_1.Controllers
             return View();
         }
 
+		[HttpGet]
 		public ActionResult Compresion_Descompresion()
 		{
+			string path = Server.MapPath("~/ArchivosTmp/");
+			string[] pathsTmp = Directory.GetFiles(path);
+			foreach (var item in pathsTmp)
+				System.IO.File.Delete(item);
+
 			return View();
 		}
 		[HttpPost]
@@ -44,7 +51,7 @@ namespace Laboratorio_1.Controllers
 					try
 					{
 						CompresionHuffman H = new CompresionHuffman();
-
+						
 						string path = Server.MapPath("~/ArchivosTmp/");
 						string pathPrueba = path + nombreArchivo[0] + ".huff";
 						path = path + ArchivoEntrada.FileName;
@@ -66,7 +73,7 @@ namespace Laboratorio_1.Controllers
 			}
 			else
 			{
-				ViewBag.Error01 = "Na ha ingresado un archivo";
+				ViewBag.Error01 = "No ha ingresado un archivo";
 			}
 			return View();
 		}

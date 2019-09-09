@@ -34,7 +34,7 @@ namespace Laboratorio_1.Models
         }
         private static void ArbolHuffman(string path)
         {
-            Dictionary<char, int> Tabla_Frecuencias = new Dictionary<char, int>();
+            //Dictionary<char, int> Tabla_Frecuencias = new Dictionary<char, int>();
             using (var File = new FileStream(path, FileMode.Open))
             {
                 var buffer = new byte[bufferLenght];
@@ -46,7 +46,6 @@ namespace Laboratorio_1.Models
                         buffer = reader.ReadBytes(bufferLenght);
                         foreach (var item in buffer)
                         {
-							//klj
 							if (Tabla_Frecuencias.Keys.Contains(Convert.ToChar(item)))
 							{
 								Tabla_Frecuencias[Convert.ToChar(item)]++;
