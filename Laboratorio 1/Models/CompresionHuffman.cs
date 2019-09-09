@@ -33,8 +33,12 @@ namespace Laboratorio_1.Models
             return Padre;
         }
         private static void ArbolHuffman(string path)
+<<<<<<< HEAD
         {
             //Dictionary<char, int> Tabla_Frecuencias = new Dictionary<char, int>();
+=======
+        { 
+>>>>>>> 09badbde0378cf3d4839b5fb13c351b52cb9463d
             using (var File = new FileStream(path, FileMode.Open))
             {
                 var buffer = new byte[bufferLenght];
