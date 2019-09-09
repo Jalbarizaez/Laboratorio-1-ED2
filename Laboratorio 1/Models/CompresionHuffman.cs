@@ -8,10 +8,11 @@ namespace Laboratorio_1.Models
 {
     public class CompresionHuffman
     {
-        private const int bufferLenght = 80;
+        private const int bufferLenght = 200;
         private static NodoHuff Raiz { get; set; }
         private static Dictionary<char, int> Tabla_Frecuencias { get; set; }
         private static Dictionary<char,string> Tabla_Caracteres { get; set; }
+		private static Dictionary<char, int> Tabla_Frecuencias2 { get; set; }
         private static decimal Cantidad_Datos;
 
         public void Compresion (string path_Lectura,string path_Escritura)
@@ -21,10 +22,37 @@ namespace Laboratorio_1.Models
             ArbolHuffman(path_Lectura);
             Obtener_Codigos_Prefijo();
             Recorrido(path_Lectura, path_Escritura);
-            Escribir_Valor_y_Frecuencia(path_Escritura);
-            
-
+            Escribir_Valor_y_Frecuencia(path_Escritura);   
         }
+
+		public void Descompresion(string path_Lectura, string path_Escritura)
+		{
+			//Sergio Trabajando
+			Tabla_Frecuencias2 = new Dictionary<char, int>();
+
+			using (var File = new FileStream(path_Lectura, FileMode.Open))
+			{
+				var buffer = new byte[bufferLenght];
+				using (var reader = new BinaryReader(File))
+				{
+					Cantidad_Datos = reader.BaseStream.Length;
+					while (reader.BaseStream.Position != reader.BaseStream.Length)
+					{
+						buffer = reader.ReadBytes(bufferLenght);
+						foreach (var item in buffer)
+						{
+							if (Tabla_Frecuencias2.Keys.Contains(Convert.ToChar(item)))
+							{
+								Tabla_Frecuencias[Convert.ToChar(item)]++;
+							}
+							else Tabla_Frecuencias.Add(Convert.ToChar(Convert.ToChar(item)), 1);
+
+						}
+					}
+				}
+			}
+		}
+
         private static NodoHuff Unir_Nodos(NodoHuff Mayor, NodoHuff Menor)
         {
             NodoHuff Padre = new NodoHuff(Mayor.Probabilidad+Menor.Probabilidad);
