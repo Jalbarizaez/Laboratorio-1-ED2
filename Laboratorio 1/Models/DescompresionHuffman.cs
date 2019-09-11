@@ -122,7 +122,43 @@ namespace Laboratorio_1.Models
         }
         private static void Recorrido(string path_Lectura, string path_Escritura)
         {
+            int inicio = 0;
+            string recorrido = "";
+            List<char> caracteres = new List<char>();
+            using (var file = new FileStream(path_Escritura, FileMode.OpenOrCreate))
+            {
+                using (var writer = new StreamWriter(file))
+                {
 
+                    using (var File = new FileStream(path_Lectura, FileMode.Open))
+                    {
+
+                        var buffer = new byte[bufferLenght];
+
+                        using (var reader = new BinaryReader(File))
+                        {
+
+                            while (reader.BaseStream.Position != reader.BaseStream.Length)
+                            {
+                                buffer = reader.ReadBytes(bufferLenght);
+
+                                foreach (var item in buffer)
+                                {
+                                    if (inicio == 0 && Convert.ToChar(item) == '|') { inicio = 1; }
+                                    else if (inicio == 1 && Convert.ToChar(item) == '|') { inicio = 2; }
+                                    else if (inicio == 2)
+                                    {
+                                        //Inicia descomprecion 
+                                        recorrido += Convert.ToString(item, 2);
+
+                                    }
+                                    else { inicio = 0; }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 }
