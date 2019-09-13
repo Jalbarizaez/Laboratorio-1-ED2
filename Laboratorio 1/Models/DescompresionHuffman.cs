@@ -10,15 +10,15 @@ namespace Laboratorio_1.Models
     {
         public const int bufferLenght = 500;
         private static NodoHuff Raiz { get; set; }
-        private static Dictionary<string, char> Tabla_Caracteres { get; set; }
-        private static Dictionary<char, int> Tabla_Frecuencias { get; set; }
+        private static Dictionary<string, byte> Tabla_Caracteres { get; set; }
+        private static Dictionary<byte, int> Tabla_Frecuencias { get; set; }
         public static int Tamaño_Datos { get; set; }
         public static decimal Cantidad_Datos;
 
         public void Descompresion(string path_Escritura, string path_Lectura)
         {
-            Tabla_Frecuencias = new Dictionary<char, int>();
-            Tabla_Caracteres = new Dictionary<string, char>();
+            Tabla_Frecuencias = new Dictionary<byte, int>();
+            Tabla_Caracteres = new Dictionary<string, byte>();
             ArbolHuffman(path_Lectura);
             Obtener_Codigos_Prefijo();
             Recorrido(path_Lectura, path_Escritura);
@@ -37,6 +37,7 @@ namespace Laboratorio_1.Models
                 string frecuencia = "";
                 string caracter = "";
                 int final = 0;
+                byte bit = new byte();
                 using (var reader = new BinaryReader(File))
                 {
                     while (reader.BaseStream.Position != reader.BaseStream.Length)
@@ -66,10 +67,10 @@ namespace Laboratorio_1.Models
                                 }
                                 else { final = 0; }
 
-                                if (caracter == "") { caracter = Convert.ToChar(item).ToString(); }
+                                if (caracter == "") { caracter = Convert.ToChar(item).ToString(); bit = item; }
                                 else if (Convert.ToChar(item) == '|' && final == 0)
                                 {
-                                    Tabla_Frecuencias.Add(Convert.ToChar(caracter), Convert.ToInt32(frecuencia));
+                                    Tabla_Frecuencias.Add(bit, Convert.ToInt32(frecuencia));
                                     caracter = "";
                                     frecuencia = "";
                                     final = 1;
@@ -83,7 +84,7 @@ namespace Laboratorio_1.Models
                 Cantidad_Datos = Convert.ToDecimal(cantidad_datos);
             }
             List<NodoHuff> Lista_Frecuencias = new List<NodoHuff>();
-            foreach (KeyValuePair<char, int> Nodos in Tabla_Frecuencias)
+            foreach (KeyValuePair<byte, int> Nodos in Tabla_Frecuencias)
             {
                 Lista_Frecuencias.Add(new NodoHuff(Nodos.Key, (Convert.ToDecimal(Nodos.Value) / Cantidad_Datos)));
             }
@@ -122,14 +123,16 @@ namespace Laboratorio_1.Models
         }
         private static void Recorrido(string path_Lectura, string path_Escritura)
         {
+
+            int caracteres_escritos = 0;
             int i = 0;
             string validacion = "";
             int inicio = 0;
             string recorrido = "";
-            List<char> caracteres = new List<char>();
+            List<byte> caracteres = new List<byte>();
             using (var file = new FileStream(path_Escritura, FileMode.OpenOrCreate))
             {
-                using (var writer = new StreamWriter(file))
+                using (var writer = new BinaryWriter(file))
                 {
 
                     using (var File = new FileStream(path_Lectura, FileMode.Open))
@@ -140,12 +143,12 @@ namespace Laboratorio_1.Models
                         using (var reader = new BinaryReader(File))
                         {
 
-                            while (reader.BaseStream.Position != reader.BaseStream.Length && file.Length <= Cantidad_Datos)
+                            while (reader.BaseStream.Position != reader.BaseStream.Length && caracteres_escritos < Cantidad_Datos)
                             {
                                 buffer = reader.ReadBytes(bufferLenght);
-
                                 foreach (var item in buffer)
                                 {
+                                    caracteres_escritos++;
                                     if (inicio == 0 && Convert.ToChar(item) == '|') { inicio = 1; }
                                     else if (inicio == 1 && Convert.ToChar(item) == '|') { inicio = 2; }
                                     else if (inicio == 2)
@@ -175,13 +178,17 @@ namespace Laboratorio_1.Models
                                     else { inicio = 0; }
                                 }
 
-                                writer.Write(string.Join("", caracteres));
+                                writer.Write(caracteres.ToArray());
                                 caracteres.Clear();
+
+
                             }
                         }
                     }
                 }
             }
+
+
         }
     }
 

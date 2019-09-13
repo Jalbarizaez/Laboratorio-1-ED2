@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Web;
 
 namespace Laboratorio_1.Models
@@ -10,19 +11,19 @@ namespace Laboratorio_1.Models
     {
         private const int bufferLenght = 500;
         private static NodoHuff Raiz { get; set; }
-        private static Dictionary<char, int> Tabla_Frecuencias { get; set; }
-        private static Dictionary<char,string> Tabla_Caracteres { get; set; }
-		private static Dictionary<char, int> Tabla_Frecuencias2 { get; set; }
+        private static Dictionary<byte, int> Tabla_Frecuencias { get; set; }
+        private static Dictionary<byte,string> Tabla_Caracteres { get; set; }
         private static decimal Cantidad_Datos;
 
         public void Compresion (string path_Lectura,string path_Escritura)
         {
-            Tabla_Frecuencias = new Dictionary<char, int>();
-            Tabla_Caracteres = new Dictionary<char, string>();
+            Tabla_Frecuencias = new Dictionary<byte, int>();
+            Tabla_Caracteres = new Dictionary<byte, string>();
             ArbolHuffman(path_Lectura);
             Obtener_Codigos_Prefijo();
+            Escribir_Valor_y_Frecuencia(path_Escritura);
             Recorrido(path_Lectura, path_Escritura);
-            Escribir_Valor_y_Frecuencia(path_Escritura);   
+            
         }
 
         private static NodoHuff Unir_Nodos(NodoHuff Mayor, NodoHuff Menor)
@@ -45,11 +46,11 @@ namespace Laboratorio_1.Models
                         buffer = reader.ReadBytes(bufferLenght);
                         foreach (var item in buffer)
                         {
-							if (Tabla_Frecuencias.Keys.Contains(Convert.ToChar(item)))
+							if (Tabla_Frecuencias.Keys.Contains((item)))
 							{
-								Tabla_Frecuencias[Convert.ToChar(item)]++;
+								Tabla_Frecuencias[(item)]++;
 							}
-							else Tabla_Frecuencias.Add(Convert.ToChar(Convert.ToChar(item)), 1);
+							else Tabla_Frecuencias.Add(item, 1);
 
                         }
                     }
@@ -57,7 +58,7 @@ namespace Laboratorio_1.Models
             }
             List<NodoHuff> Lista_Frecuencias = new List<NodoHuff>();
 			//Tomar este codigo para hacer el arbol, porque lo primero que me da es la lista de frecuencias
-            foreach(KeyValuePair<char,int> Nodos in Tabla_Frecuencias)
+            foreach(KeyValuePair<byte,int> Nodos in Tabla_Frecuencias)
             {
 				//(Dato,Probabilidad)
                 Lista_Frecuencias.Add(new NodoHuff(Nodos.Key, (Convert.ToDecimal(Nodos.Value) / Cantidad_Datos)));
@@ -91,7 +92,7 @@ namespace Laboratorio_1.Models
         private static void Recorrido(string path_Lectura, string path_Escritura)
         {
             string recorrido = "";
-            using (var file = new FileStream(path_Escritura, FileMode.OpenOrCreate))
+            using (var writer = new FileStream(path_Escritura, FileMode.Append))
             {
                 using (var File = new FileStream(path_Lectura, FileMode.Open))
                 {
@@ -100,56 +101,67 @@ namespace Laboratorio_1.Models
                     var Bytes = new List<byte>();
                     using (var reader = new BinaryReader(File))
                     {
-                        using (var writer = new BinaryWriter(file))
+
+                        while (reader.BaseStream.Position != reader.BaseStream.Length)
                         {
-                            while (reader.BaseStream.Position != reader.BaseStream.Length)
+                            buffer = reader.ReadBytes(bufferLenght);
+                            //Lee el archivo letra por letra
+                            foreach (var item in buffer)
                             {
-                                buffer = reader.ReadBytes(bufferLenght);
-								//Lee el archivo letra por letra
-                                foreach (var item in buffer)
+                                recorrido += Tabla_Caracteres[item];
+                                if (recorrido.Length >= 8)
                                 {
-                                    recorrido += Tabla_Caracteres[Convert.ToChar(item)];
-                                    if (recorrido.Length >= 8)
+                                    while (recorrido.Length > 8)
                                     {
-                                        while (recorrido.Length > 8)
-                                        {
-                                            Bytes.Add(Convert.ToByte(recorrido.Substring(0, 8), 2));
-											//Junta el codigo prefico en grupos de 8 en 8
-                                            recorrido = recorrido.Remove(0, 8);
-                                        }
+                                        Bytes.Add(Convert.ToByte(recorrido.Substring(0, 8), 2));
+                                        //Junta el codigo prefico en grupos de 8 en 8
+                                        recorrido = recorrido.Remove(0, 8);
                                     }
                                 }
-								//Escribe la lista de Bytes y se imprimen como ascci
-                                writer.Write(Bytes.ToArray());
-                                Bytes.Clear();
                             }
-                            for (int i = recorrido.Length; i < 8; i++)
-                            {
-                                recorrido += "0";
-                            }
-                            writer.Write(Convert.ToByte(recorrido, 2));
+                            writer.Write(Bytes.ToArray(), 0, Bytes.ToArray().Length);
+                            Bytes.Clear();
+
+                            //Escribe la lista de Bytes y se imprimen como ascci
 
                         }
+                        for (int i = recorrido.Length; i < 8; i++)
+                        {
+                            recorrido += "0";
+                        }
+                        Bytes.Add(Convert.ToByte(recorrido, 2));
+                        writer.Write(Bytes.ToArray(), 0, Bytes.ToArray().Length);
+
+
                     }
+                
                 }
             }
         }
 
         private static void Escribir_Valor_y_Frecuencia(string path)
         {
+            var escritura = new byte[bufferLenght];
+
             using (var file = new FileStream(path, FileMode.OpenOrCreate))
             {
-                using (var writer = new StreamWriter(file))
+                using (var writer = new BinaryWriter(file))
                 {
-                    writer.Write(Cantidad_Datos.ToString() + "|");
-					
-					//Escribe el caracter junto con su Frecuencia
-                    foreach (KeyValuePair<char, int> Valores in Tabla_Frecuencias)
+                    escritura = Encoding.UTF8.GetBytes(Cantidad_Datos.ToString().ToArray());
+                    //writer.Write(Cantidad_Datos.ToString() + "|");
+                    writer.Write(escritura);
+                    writer.Write(Convert.ToByte('|'));
+                    //Escribe el caracter junto con su Frecuencia
+                    foreach (KeyValuePair<byte, int> Valores in Tabla_Frecuencias)
                     {
-                        writer.Write(Valores.Key.ToString() + Valores.Value.ToString() + "|");
+                        writer.Write(Valores.Key);
+                        escritura = Encoding.UTF8.GetBytes(Valores.Value.ToString().ToArray());//+ Valores.Value.ToString() + "|");
+                        writer.Write(escritura);
+                        writer.Write(Convert.ToByte('|'));
                     }
-                    writer.Write("|");
+                    writer.Write(Convert.ToByte('|'));
                 }
+            
             }
         }
     }

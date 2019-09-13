@@ -7,13 +7,13 @@ namespace Laboratorio_1.Models
 {
     public class NodoHuff
     {
-        public char Dato { get; set; }
+        public byte Dato { get; set; }
         public decimal Probabilidad { get; set; }
         public NodoHuff Izquierda { get; set; }
         public NodoHuff Derecha { get; set; }
         public NodoHuff Padre { get; set; }
 
-        public NodoHuff (char dato, decimal probabilidad)
+        public NodoHuff (byte dato, decimal probabilidad)
         {
             Dato = dato;
             Probabilidad = probabilidad;
