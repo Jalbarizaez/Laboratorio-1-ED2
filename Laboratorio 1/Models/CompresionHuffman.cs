@@ -8,7 +8,7 @@ namespace Laboratorio_1.Models
 {
     public class CompresionHuffman
     {
-        private const int bufferLenght = 200;
+        private const int bufferLenght = 500;
         private static NodoHuff Raiz { get; set; }
         private static Dictionary<char, int> Tabla_Frecuencias { get; set; }
         private static Dictionary<char,string> Tabla_Caracteres { get; set; }

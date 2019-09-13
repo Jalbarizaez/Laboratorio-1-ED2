@@ -10,7 +10,7 @@ namespace Laboratorio_1.Models
     {
         public const int bufferLenght = 500;
         private static NodoHuff Raiz { get; set; }
-        private static Dictionary<char, string> Tabla_Caracteres { get; set; }
+        private static Dictionary<string, char> Tabla_Caracteres { get; set; }
         private static Dictionary<char, int> Tabla_Frecuencias { get; set; }
         public static int Tamaño_Datos { get; set; }
         public static decimal Cantidad_Datos;
@@ -18,7 +18,7 @@ namespace Laboratorio_1.Models
         public void Descompresion(string path_Escritura, string path_Lectura)
         {
             Tabla_Frecuencias = new Dictionary<char, int>();
-            Tabla_Caracteres = new Dictionary<char, string>();
+            Tabla_Caracteres = new Dictionary<string, char>();
             ArbolHuffman(path_Lectura);
             Obtener_Codigos_Prefijo();
             Recorrido(path_Lectura, path_Escritura);
@@ -101,7 +101,7 @@ namespace Laboratorio_1.Models
         }
         private static void Codigos_Prefijo(NodoHuff Nodo, string recorrido)
         {
-            if (Nodo.Hoja()) { Tabla_Caracteres.Add(Nodo.Dato, recorrido); return; }
+            if (Nodo.Hoja()) { Tabla_Caracteres.Add( recorrido, Nodo.Dato); return; }
             else
             {
                 if (Nodo.Izquierda != null) Codigos_Prefijo(Nodo.Izquierda, recorrido + "0");
@@ -117,11 +117,13 @@ namespace Laboratorio_1.Models
         }
         private static void Obtener_Codigos_Prefijo()
         {
-            if (Raiz.Hoja()) Tabla_Caracteres.Add(Raiz.Dato, "1");
+            if (Raiz.Hoja()) Tabla_Caracteres.Add( "1", Raiz.Dato);
             else Codigos_Prefijo(Raiz, "");
         }
         private static void Recorrido(string path_Lectura, string path_Escritura)
         {
+            int i = 0;
+            string validacion = "";
             int inicio = 0;
             string recorrido = "";
             List<char> caracteres = new List<char>();
@@ -138,7 +140,7 @@ namespace Laboratorio_1.Models
                         using (var reader = new BinaryReader(File))
                         {
 
-                            while (reader.BaseStream.Position != reader.BaseStream.Length)
+                            while (reader.BaseStream.Position != reader.BaseStream.Length && file.Length <= Cantidad_Datos)
                             {
                                 buffer = reader.ReadBytes(bufferLenght);
 
@@ -148,12 +150,33 @@ namespace Laboratorio_1.Models
                                     else if (inicio == 1 && Convert.ToChar(item) == '|') { inicio = 2; }
                                     else if (inicio == 2)
                                     {
-                                        //Inicia descomprecion 
-                                        recorrido += Convert.ToString(item, 2);
+                                        //Inicia descomprecion
+                                        var bits = Convert.ToString(item, 2);
+                                        var completo = bits.PadLeft(8, '0');
+                                        recorrido += completo;
+                                        var comparacion = recorrido.ToCharArray();
+                                        i = 0;
+                                        while (i < recorrido.Length)
+                                        {
+                                            validacion += comparacion[i];
+                                            i++;
+                                            if (Tabla_Caracteres.Keys.Contains(validacion))
+                                            {
+                                                i = 0;
+                                                caracteres.Add(Tabla_Caracteres[validacion]);
+                                                recorrido = recorrido.Remove(0, validacion.Length);
+                                                comparacion = recorrido.ToCharArray();
+                                                validacion = "";
+                                            }
+                                        }
+                                        validacion = "";
 
                                     }
                                     else { inicio = 0; }
                                 }
+
+                                writer.Write(string.Join("", caracteres));
+                                caracteres.Clear();
                             }
                         }
                     }
@@ -161,4 +184,5 @@ namespace Laboratorio_1.Models
             }
         }
     }
+
 }
