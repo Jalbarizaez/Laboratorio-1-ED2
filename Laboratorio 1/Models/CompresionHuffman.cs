@@ -22,7 +22,7 @@ namespace Laboratorio_1.Models
             ArbolHuffman(path_Lectura);
             Obtener_Codigos_Prefijo();
             Escribir_Valor_y_Frecuencia(path_Escritura);
-            Recorrido(path_Lectura, path_Escritura);     
+            Recorrido(path_Lectura, path_Escritura);
         }
 
         private static NodoHuff Unir_Nodos(NodoHuff Mayor, NodoHuff Menor)
@@ -163,5 +163,37 @@ namespace Laboratorio_1.Models
             
             }
         }
+
+		public void SetMisCompresiones(string pathLectura, string pathEscritura, string pathMiFichero)
+		{
+			FileInfo ArchivoOriginal = new FileInfo(pathLectura);
+			string nombre = ArchivoOriginal.Name;
+			double pesoArchivo = ArchivoOriginal.Length;
+
+			FileInfo ArchivoComprimido = new FileInfo(pathEscritura);
+			double pesoArchivo2 = ArchivoComprimido.Length;
+
+			double RazonDeCompresion = pesoArchivo2 / pesoArchivo;
+			double FactorDeCompresion = pesoArchivo / pesoArchivo2;
+			double PorcentajeDeReduccion = 100- (RazonDeCompresion * 100);
+
+			using (StreamWriter Writer = File.AppendText(pathMiFichero))
+			{
+				Writer.WriteLine(nombre + "," + RazonDeCompresion + "," + FactorDeCompresion + "," + PorcentajeDeReduccion);
+			}
+		}
+		public List<string> GetMisCompresiones(string pathMiFichero)
+		{
+			List<string> ListaDeCompresiones = new List<string>();
+			using (StreamReader Reader = new StreamReader(pathMiFichero))
+			{
+				while (Reader.EndOfStream)
+				{
+					ListaDeCompresiones.Add(Reader.ReadLine());
+				}
+			}
+			return ListaDeCompresiones;
+		}
+
     }
 }

@@ -1,6 +1,29 @@
-﻿@{
+﻿@model List<string>
+@{
     ViewBag.Title = "MisCompresiones";
 }
 
 <h2>MisCompresiones</h2>
 
+<table class="table">
+	<thead>
+		<tr>
+			<th>Nombre Archivo</th>
+			<th>Razon de Compresion</th>
+			<th>Factor de Compresion</th>
+			<th>Porcentaje de Reducción</th>
+		</tr>
+	</thead>
+	<tbody>
+		@foreach (string linea in Model)
+		{
+			string[] campos = linea.Split(',');	
+			<tr>
+				<td>@campos[0]</td>
+				<td>@campos[1]</td>
+				<td>@campos[2]</td>
+				<td>@campos[3] %</td>
+			</tr>
+		}
+	</tbody>
+</table>

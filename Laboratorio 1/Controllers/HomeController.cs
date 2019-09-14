@@ -62,7 +62,12 @@ namespace Laboratorio_1.Controllers
 						path = path + ArchivoEntrada.FileName;
 						ArchivoEntrada.SaveAs(path);
 
+						string pathMiFichero = Server.MapPath("~/ArchivoMisCompresiones/");
+						pathMiFichero = pathMiFichero + "FicheroMisCompresiones.txt";
+
+
 						H.Compresion(path, pathPrueba);
+						H.SetMisCompresiones(path, pathPrueba, pathMiFichero);
 						ViewBag.Ok = "Proceso completado :)";
 						return File(pathPrueba, "huff", (nombreArchivo[0] + ".huff"));
 					}
@@ -90,10 +95,14 @@ namespace Laboratorio_1.Controllers
 			}
 			return View();
 		}
+
 		public ActionResult MisCompresiones()
 		{
-
-			return View();
+			CompresionHuffman H = new CompresionHuffman();
+			string pathMiFichero = Server.MapPath("~/ArchivoMisCompresiones/");
+			pathMiFichero = pathMiFichero + "FicheroMisCompresiones.txt";
+			List<string> Campos = H.GetMisCompresiones(pathMiFichero);
+			return View(Campos);
 		}
 	}
 }
