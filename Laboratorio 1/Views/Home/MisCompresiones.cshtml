@@ -12,6 +12,7 @@
 			<th>Razon de Compresion</th>
 			<th>Factor de Compresion</th>
 			<th>Porcentaje de Reducción</th>
+			<th>Tipo de Compresion</th>
 		</tr>
 	</thead>
 	<tbody>
@@ -20,9 +21,10 @@
 			string[] campos = linea.Split(',');	
 			<tr>
 				<td>@campos[0]</td>
-				<td>@campos[1]</td>
-				<td>@campos[2]</td>
-				<td>@campos[3] %</td>
+				<td>@campos[1].Substring(0,15)</td>
+				<td>@campos[2].Substring(0, 15)</td>
+				<td>@campos[3].Substring(0, 6) %</td>
+				<td>@campos[4]</td>
 			</tr>
 		}
 	</tbody>

@@ -179,15 +179,16 @@ namespace Laboratorio_1.Models
 
 			using (StreamWriter Writer = File.AppendText(pathMiFichero))
 			{
-				Writer.WriteLine(nombre + "," + RazonDeCompresion + "," + FactorDeCompresion + "," + PorcentajeDeReduccion);
+				Writer.WriteLine(nombre + "," + RazonDeCompresion + "," + FactorDeCompresion + "," + PorcentajeDeReduccion + "," + "Huffman");
 			}
 		}
+
 		public List<string> GetMisCompresiones(string pathMiFichero)
 		{
 			List<string> ListaDeCompresiones = new List<string>();
 			using (StreamReader Reader = new StreamReader(pathMiFichero))
 			{
-				while (Reader.EndOfStream)
+				while (!Reader.EndOfStream)
 				{
 					ListaDeCompresiones.Add(Reader.ReadLine());
 				}
