@@ -14,6 +14,7 @@ namespace Laboratorio_1.Models
         private static Dictionary<byte, int> Tabla_Frecuencias { get; set; }
         public static int Tamaño_Datos { get; set; }
         public static decimal Cantidad_Datos;
+        private static char separa = new char();
 
         public void Descompresion(string path_Escritura, string path_Lectura)
         {
@@ -48,7 +49,13 @@ namespace Laboratorio_1.Models
 
                             if (separador == 0)
                             {
-                                if (Convert.ToChar(item) == '|') { separador = 1; }
+                                if (Convert.ToChar(item) == '|' || Convert.ToChar(item) == 'ÿ' || Convert.ToChar(item) == 'ß')
+                                {
+                                    separador = 1;
+                                    if (Convert.ToChar(item) == '|') { separa = '|'; }
+                                    else if (Convert.ToChar(item) == 'ÿ') { separa = 'ÿ'; }
+                                    else { separa = 'ß'; }
+                                }
                                 else
                                 {
                                     cantidad_datos += Convert.ToChar(item).ToString();
@@ -60,7 +67,7 @@ namespace Laboratorio_1.Models
                             }
                             else
                             {
-                                if (final == 1 && Convert.ToChar(item) == '|')
+                                if (final == 1 && Convert.ToChar(item) == separa)
                                 {
                                     final = 2;
                                     separador = 2;
@@ -68,7 +75,7 @@ namespace Laboratorio_1.Models
                                 else { final = 0; }
 
                                 if (caracter == "") { caracter = Convert.ToChar(item).ToString(); bit = item; }
-                                else if (Convert.ToChar(item) == '|' && final == 0)
+                                else if (Convert.ToChar(item) == separa && final == 0)
                                 {
                                     Tabla_Frecuencias.Add(bit, Convert.ToInt32(frecuencia));
                                     caracter = "";
@@ -149,8 +156,8 @@ namespace Laboratorio_1.Models
                                 foreach (var item in buffer)
                                 {
                                     caracteres_escritos++;
-                                    if (inicio == 0 && Convert.ToChar(item) == '|') { inicio = 1; }
-                                    else if (inicio == 1 && Convert.ToChar(item) == '|') { inicio = 2; }
+                                    if (inicio == 0 && Convert.ToChar(item) == separa) { inicio = 1; }
+                                    else if (inicio == 1 && Convert.ToChar(item) == separa) { inicio = 2; }
                                     else if (inicio == 2)
                                     {
                                         //Inicia descomprecion

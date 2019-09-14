@@ -9,6 +9,7 @@ namespace Laboratorio_1.Models
 {
     public class CompresionHuffman
     {
+        private static char separador = new char();
         private const int bufferLenght = 500;
         private static NodoHuff Raiz { get; set; }
         private static Dictionary<byte, int> Tabla_Frecuencias { get; set; }
@@ -63,13 +64,21 @@ namespace Laboratorio_1.Models
 				//(Dato,Probabilidad)
                 Lista_Frecuencias.Add(new NodoHuff(Nodos.Key, (Convert.ToDecimal(Nodos.Value) / Cantidad_Datos)));
             }
-			//Uniendo Nodos
-            while (Lista_Frecuencias.Count >1)
+            //Uniendo Nodos
+            while (Lista_Frecuencias.Count > 1)
             {
-                Lista_Frecuencias = Lista_Frecuencias.OrderBy(x => x.Probabilidad).ToList();
-                NodoHuff Union = Unir_Nodos(Lista_Frecuencias[1], Lista_Frecuencias[0]);
-                Lista_Frecuencias.RemoveRange(0, 2);
-                Lista_Frecuencias.Add(Union);
+                if (Lista_Frecuencias.Count == 1)
+
+                {
+                    break;
+                }
+                else
+                {
+                    Lista_Frecuencias = Lista_Frecuencias.OrderBy(x => x.Probabilidad).ToList();
+                    NodoHuff Union = Unir_Nodos(Lista_Frecuencias[1], Lista_Frecuencias[0]);
+                    Lista_Frecuencias.RemoveRange(0, 2);
+                    Lista_Frecuencias.Add(Union);
+                }
             }
             Raiz = Lista_Frecuencias[0];
            //Aqui el arbol ya esta terminado
@@ -142,6 +151,15 @@ namespace Laboratorio_1.Models
         private static void Escribir_Valor_y_Frecuencia(string path)
         {
             var escritura = new byte[bufferLenght];
+            separador = '|';
+            if (Tabla_Caracteres.Keys.Contains(Convert.ToByte('|')))
+            {
+                separador = 'ÿ';
+                if (Tabla_Caracteres.Keys.Contains(Convert.ToByte('ÿ')))
+                {
+                    separador = 'ß';
+                }
+            }
 
             using (var file = new FileStream(path, FileMode.OpenOrCreate))
             {
@@ -150,16 +168,16 @@ namespace Laboratorio_1.Models
                     escritura = Encoding.UTF8.GetBytes(Cantidad_Datos.ToString().ToArray());
                     //writer.Write(Cantidad_Datos.ToString() + "|");
                     writer.Write(escritura);
-                    writer.Write(Convert.ToByte('|'));
+                    writer.Write(Convert.ToByte(separador));
                     //Escribe el caracter junto con su Frecuencia
                     foreach (KeyValuePair<byte, int> Valores in Tabla_Frecuencias)
                     {
                         writer.Write(Valores.Key);
                         escritura = Encoding.UTF8.GetBytes(Valores.Value.ToString().ToArray());//+ Valores.Value.ToString() + "|");
                         writer.Write(escritura);
-                        writer.Write(Convert.ToByte('|'));
+                        writer.Write(Convert.ToByte(separador));
                     }
-                    writer.Write(Convert.ToByte('|'));
+                    writer.Write(Convert.ToByte(separador));
                 }
             
             }
