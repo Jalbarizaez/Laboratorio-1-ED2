@@ -24,7 +24,6 @@ namespace Laboratorio_1.Models
             Obtener_Codigos_Prefijo();
             Escribir_Valor_y_Frecuencia(path_Escritura);
             Recorrido(path_Lectura, path_Escritura);
-            
         }
 
         private static NodoHuff Unir_Nodos(NodoHuff Mayor, NodoHuff Menor)
@@ -34,6 +33,7 @@ namespace Laboratorio_1.Models
             Padre.Derecha = Menor;
             return Padre;
         }
+
         private static void ArbolHuffman(string path)
         {
             using (var File = new FileStream(path, FileMode.Open))
@@ -57,8 +57,8 @@ namespace Laboratorio_1.Models
                     }
                 }
             }
+
             List<NodoHuff> Lista_Frecuencias = new List<NodoHuff>();
-			//Tomar este codigo para hacer el arbol, porque lo primero que me da es la lista de frecuencias
             foreach(KeyValuePair<byte,int> Nodos in Tabla_Frecuencias)
             {
 				//(Dato,Probabilidad)
@@ -83,7 +83,8 @@ namespace Laboratorio_1.Models
             Raiz = Lista_Frecuencias[0];
            //Aqui el arbol ya esta terminado
         }
-        private static void Codigos_Prefijo(NodoHuff Nodo, string recorrido)
+
+		private static void Codigos_Prefijo(NodoHuff Nodo, string recorrido)
         {
             if (Nodo.Hoja()) Tabla_Caracteres.Add(Nodo.Dato, recorrido);
             else
@@ -92,13 +93,15 @@ namespace Laboratorio_1.Models
                 if (Nodo.Derecha != null) Codigos_Prefijo(Nodo.Derecha, recorrido + "1");
             }
         }
+		
 		//LLena la tabla de caracteres con su ascii y su prefijo
         private static void Obtener_Codigos_Prefijo()
         {
             if (Raiz.Hoja()) Tabla_Caracteres.Add(Raiz.Dato, "1");
             else Codigos_Prefijo(Raiz, "");
         }
-        private static void Recorrido(string path_Lectura, string path_Escritura)
+
+		private static void Recorrido(string path_Lectura, string path_Escritura)
         {
             string recorrido = "";
             using (var writer = new FileStream(path_Escritura, FileMode.Append))
@@ -130,9 +133,7 @@ namespace Laboratorio_1.Models
                             }
                             writer.Write(Bytes.ToArray(), 0, Bytes.ToArray().Length);
                             Bytes.Clear();
-
                             //Escribe la lista de Bytes y se imprimen como ascci
-
                         }
                         for (int i = recorrido.Length; i < 8; i++)
                         {
@@ -140,8 +141,6 @@ namespace Laboratorio_1.Models
                         }
                         Bytes.Add(Convert.ToByte(recorrido, 2));
                         writer.Write(Bytes.ToArray(), 0, Bytes.ToArray().Length);
-
-
                     }
                 
                 }
@@ -182,5 +181,38 @@ namespace Laboratorio_1.Models
             
             }
         }
+
+		public void SetMisCompresiones(string pathLectura, string pathEscritura, string pathMiFichero)
+		{
+			FileInfo ArchivoOriginal = new FileInfo(pathLectura);
+			string nombre = ArchivoOriginal.Name;
+			double pesoArchivo = ArchivoOriginal.Length;
+
+			FileInfo ArchivoComprimido = new FileInfo(pathEscritura);
+			double pesoArchivo2 = ArchivoComprimido.Length;
+
+			double RazonDeCompresion = pesoArchivo2 / pesoArchivo;
+			double FactorDeCompresion = pesoArchivo / pesoArchivo2;
+			double PorcentajeDeReduccion = 100- (RazonDeCompresion * 100);
+
+			using (StreamWriter Writer = File.AppendText(pathMiFichero))
+			{
+				Writer.WriteLine(nombre + "," + RazonDeCompresion + "," + FactorDeCompresion + "," + PorcentajeDeReduccion + "," + "Huffman");
+			}
+		}
+
+		public List<string> GetMisCompresiones(string pathMiFichero)
+		{
+			List<string> ListaDeCompresiones = new List<string>();
+			using (StreamReader Reader = new StreamReader(pathMiFichero))
+			{
+				while (!Reader.EndOfStream)
+				{
+					ListaDeCompresiones.Add(Reader.ReadLine());
+				}
+			}
+			return ListaDeCompresiones;
+		}
+
     }
 }

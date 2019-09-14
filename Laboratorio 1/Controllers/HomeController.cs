@@ -42,33 +42,51 @@ namespace Laboratorio_1.Controllers
 		[HttpPost]
 		public ActionResult Compresion_Descompresion(HttpPostedFileBase ArchivoEntrada)
 		{
+			string pathABorrar = Server.MapPath("~/ArchivosTmp/");
+			string[] pathsTmp = Directory.GetFiles(pathABorrar);
+			foreach (var item in pathsTmp)
+				System.IO.File.Delete(item);
+
 			if (ArchivoEntrada != null)
 			{
 				string[] nombreArchivo = ArchivoEntrada.FileName.Split('.');
 
-				if (nombreArchivo[1] == "txt")
+				try
 				{
-					try
+					if (nombreArchivo[1] == "txt")
 					{
 						CompresionHuffman H = new CompresionHuffman();
-						
+
 						string path = Server.MapPath("~/ArchivosTmp/");
-						string pathPrueba = path + nombreArchivo[0] + ".huff";
+						string pathPrueba = path + nombreArchivo[0];
 						path = path + ArchivoEntrada.FileName;
 						ArchivoEntrada.SaveAs(path);
 
-						ViewBag.Ok = "Archivo Comprimido :)";
+						string pathMiFichero = Server.MapPath("~/ArchivoMisCompresiones/");
+						pathMiFichero = pathMiFichero + "FicheroMisCompresiones.txt";
 
-						H.Compresion(path, (pathPrueba));
+
+						H.Compresion(path, pathPrueba);
+						H.SetMisCompresiones(path, pathPrueba, pathMiFichero);
+						ViewBag.Ok = "Proceso completado :)";
 						return File(pathPrueba, "huff", (nombreArchivo[0] + ".huff"));
 					}
-					catch
+					else if (nombreArchivo[1] == "huff")
 					{
-						ViewBag.Error02 = "Ha ocurrido un error con su archivo";
+						DescompresionHuffman H = new DescompresionHuffman();
+						string path = Server.MapPath("~/ArchivosTmp/");
+						string pathPrueba = path + nombreArchivo[0];
+						path = path + ArchivoEntrada.FileName;
+						ArchivoEntrada.SaveAs(path);
+
+						H.Descompresion(pathPrueba, path);
+						ViewBag.ok = "Proceso completado :)";
+						return File(pathPrueba, "txt", (nombreArchivo[0] + ".txt"));
 					}
 				}
-				else if (nombreArchivo[1] == "txt")
+				catch
 				{
+					ViewBag.Error02 = "Ha ocurrido un error con su archivo";
 				}
 			}
 			else
@@ -76,6 +94,15 @@ namespace Laboratorio_1.Controllers
 				ViewBag.Error01 = "No ha ingresado un archivo";
 			}
 			return View();
+		}
+
+		public ActionResult MisCompresiones()
+		{
+			CompresionHuffman H = new CompresionHuffman();
+			string pathMiFichero = Server.MapPath("~/ArchivoMisCompresiones/");
+			pathMiFichero = pathMiFichero + "FicheroMisCompresiones.txt";
+			List<string> Campos = H.GetMisCompresiones(pathMiFichero);
+			return View(Campos);
 		}
 	}
 }

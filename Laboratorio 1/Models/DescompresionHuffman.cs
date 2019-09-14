@@ -23,8 +23,6 @@ namespace Laboratorio_1.Models
             ArbolHuffman(path_Lectura);
             Obtener_Codigos_Prefijo();
             Recorrido(path_Lectura, path_Escritura);
-
-
         }
         static void ArbolHuffman(string path)
         {
