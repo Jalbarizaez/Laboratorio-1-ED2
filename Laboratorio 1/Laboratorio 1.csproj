@@ -131,6 +131,7 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Models\CompresionHuffman.cs" />
+    <Compile Include="Models\CompresionLZW.cs" />
     <Compile Include="Models\DescompresionHuffman.cs" />
     <Compile Include="Models\NodoHuff.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
