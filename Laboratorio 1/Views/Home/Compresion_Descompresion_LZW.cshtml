@@ -1,7 +1,18 @@
 ﻿
 @{
-    ViewBag.Title = "Compresion_Descompresion_LZW";
+	ViewBag.Title = "Compresion_Descompresion_LZW";
 }
 
-<h2>Compresion_Descompresion_LZW</h2>
-
+<h2>Compresion y Descompresion LZW</h2>
+<br />
+<h1>Cargue su archivo</h1>
+<br />
+<h2 class="danger">@ViewBag.Error01</h2>
+<h2 class="danger">@ViewBag.Error02</h2>
+<h2 class="success">@ViewBag.Ok</h2>
+<br />
+<form method="post" enctype="multipart/form-data">
+	<input type="file" name="ArchivoEntrada" />
+	<br />
+	<button type="submit">Iniciar</button>
+</form>
