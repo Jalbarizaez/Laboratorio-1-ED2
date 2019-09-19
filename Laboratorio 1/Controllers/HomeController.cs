@@ -20,7 +20,10 @@ namespace Laboratorio_1.Controllers
 
 		public ActionResult Index()
         {
-            return View();
+			string pathCarpeta = Path.Combine(Server.MapPath("~/"), "ArchivosTmp");
+			Directory.CreateDirectory(pathCarpeta);
+			BorrarArchivosTemporales();
+			return View();
         }
 
         public ActionResult About()
@@ -147,9 +150,7 @@ namespace Laboratorio_1.Controllers
 				}
 			}
 			else
-			{
 				ViewBag.Error01 = "No ha ingresado un archivo";
-			}
 
 			return View();
 		}

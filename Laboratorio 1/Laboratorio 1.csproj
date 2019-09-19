@@ -175,10 +175,10 @@
     <Content Include="Views\Home\Index.cshtml" />
     <Content Include="Views\Home\Compresion_Descompresion.cshtml" />
     <Content Include="Views\Home\MisCompresiones.cshtml" />
+    <Content Include="Views\Home\Compresion_Descompresion_LZW.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="ArchivosTmp\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff2" />
