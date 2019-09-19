@@ -10,18 +10,18 @@ namespace Laboratorio_1.Models
 	{
 		private static Dictionary<string, int> Tabla_Caracteres { get; set; }
 		private const int bufferLenght = 500;
-		private int CantidadDeCaracteres = 0;
 
-		public void Compresion(string path)
+		public void Compresion(string pathLectura, string pathEscritura)
 		{
 			Tabla_Caracteres = new Dictionary<string, int>();
+			Diccionario_Inicial(pathLectura, pathEscritura);
+			Diccionario_Completo(pathLectura, pathEscritura);
 		}
-
-		private void CrearDiccionario(string path)
+		private void Diccionario_Inicial(string pathLectura, string pathEscritura)
 		{
 			var buffer = new char[bufferLenght];	
 			//Se llena el diccionario con los valores iniciales
-			using (var file = new FileStream(path, FileMode.Open))
+			using (var file = new FileStream(pathLectura, FileMode.Open))
 			{
 				using (var reader = new BinaryReader(file))
 				{
@@ -42,11 +42,15 @@ namespace Laboratorio_1.Models
 					}
 				}
 			}
-			CantidadDeCaracteres = Tabla_Caracteres.Count();
+			//Escribir aqui el diccionario al archivo
+		}
+		private void Diccionario_Completo(string pathLectura, string pathEscritura)
+		{
 			//Aqui guarda lo que debe ser escrito en Bytes
 			var resultado = new List<int>();
 			string UltimoCaracter = "";
-			using (var file = new FileStream(path, FileMode.Open))
+			var buffer = new char[bufferLenght];
+			using (var file = new FileStream(pathLectura, FileMode.Open))
 			{
 				using (var reader = new BinaryReader(file))
 				{
@@ -77,8 +81,10 @@ namespace Laboratorio_1.Models
 							UltimoCaracter = LineaTmp;
 					}
 				}
+				resultado.Add(Tabla_Caracteres[UltimoCaracter]);
 			}
 
+			//Escribir aca todo los numero en bytes al archivo de escritura
 		}
 	}
 }

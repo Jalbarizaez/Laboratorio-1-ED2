@@ -52,12 +52,10 @@ namespace Laboratorio_1.Models
 								Tabla_Frecuencias[(item)]++;
 							}
 							else Tabla_Frecuencias.Add(item, 1);
-
                         }
                     }
                 }
             }
-
             List<NodoHuff> Lista_Frecuencias = new List<NodoHuff>();
             foreach(KeyValuePair<byte,int> Nodos in Tabla_Frecuencias)
             {
