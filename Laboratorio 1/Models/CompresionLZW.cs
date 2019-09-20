@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.IO;
+using System.Text;
 
 namespace Laboratorio_1.Models
 {
@@ -14,10 +15,11 @@ namespace Laboratorio_1.Models
 		public void Compresion(string pathLectura, string pathEscritura)
 		{
 			Tabla_Caracteres = new Dictionary<string, int>();
-			Diccionario_Inicial(pathLectura, pathEscritura);
-			Diccionario_Completo(pathLectura, pathEscritura);
-		}
-		private void Diccionario_Inicial(string pathLectura, string pathEscritura)
+            Diccionario_Inicial(pathLectura);
+            Escribir_Diccionario(pathEscritura);
+            Diccionario_Completo(pathLectura, pathEscritura);
+        }
+		private void Diccionario_Inicial(string pathLectura)
 		{
 			var buffer = new char[bufferLenght];	
 			//Se llena el diccionario con los valores iniciales
@@ -44,7 +46,41 @@ namespace Laboratorio_1.Models
 			}
 			//Escribir aqui el diccionario al archivo
 		}
-		private void Diccionario_Completo(string pathLectura, string pathEscritura)
+        private void Escribir_Diccionario(string pathEscritura)
+        {
+            string separador = "";
+            var escritura = new byte[bufferLenght];
+            separador = "|";
+            if (Tabla_Caracteres.Keys.Contains("|"))
+            {
+                separador = "ÿ";
+                if (Tabla_Caracteres.Keys.Contains("ÿ"))
+                {
+                    separador = "ß";
+                }
+            }
+
+            using (var file = new FileStream(pathEscritura, FileMode.OpenOrCreate))
+            {
+                using (var writer = new BinaryWriter(file))
+                {
+
+                    //Escribe el caracter junto con su Frecuencia
+                    foreach (KeyValuePair<string, int> Valores in Tabla_Caracteres)
+                    {
+                        escritura = Encoding.UTF8.GetBytes(Valores.Key.ToString().ToArray());//+ Valores.Value.ToString() + "|");
+                        writer.Write(escritura);
+                        escritura = Encoding.UTF8.GetBytes(Valores.Value.ToString().ToArray());//+ Valores.Value.ToString() + "|");
+                        writer.Write(escritura);
+                        writer.Write(Convert.ToByte(Convert.ToChar(separador)));
+                    }
+                    writer.Write(Convert.ToByte(Convert.ToChar(separador)));
+                }
+
+            }
+
+        }
+        private void Diccionario_Completo(string pathLectura, string pathEscritura)
 		{
 			var buffer = new byte[bufferLenght];
 			var resultado = new List<int>();
