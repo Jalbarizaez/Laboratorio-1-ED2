@@ -131,6 +131,7 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Models\CompresionHuffman.cs" />
+    <Compile Include="Models\CompresionLZW.cs" />
     <Compile Include="Models\DescompresionHuffman.cs" />
     <Compile Include="Models\NodoHuff.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -174,10 +175,10 @@
     <Content Include="Views\Home\Index.cshtml" />
     <Content Include="Views\Home\Compresion_Descompresion.cshtml" />
     <Content Include="Views\Home\MisCompresiones.cshtml" />
+    <Content Include="Views\Home\Compresion_Descompresion_LZW.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="ArchivosTmp\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff2" />
