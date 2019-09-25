@@ -51,7 +51,6 @@ namespace Laboratorio_1.Controllers
 			if (ArchivoEntrada != null)
 			{
 				string[] nombreArchivo = ArchivoEntrada.FileName.Split('.');
-
 				try
 				{
 					if (nombreArchivo[1] == "txt")
@@ -66,9 +65,8 @@ namespace Laboratorio_1.Controllers
 						string pathMiFichero = Server.MapPath("~/ArchivoMisCompresiones/");
 						pathMiFichero = pathMiFichero + "FicheroMisCompresiones.txt";
 
-
 						H.Compresion(path, pathPrueba);
-						H.SetMisCompresiones(path, pathPrueba, pathMiFichero);
+						H.SetMisCompresiones(path, pathPrueba, pathMiFichero, "Huffman");
 						ViewBag.Ok = "Proceso completado :)";
 						return File(pathPrueba, "huff", (nombreArchivo[0] + ".huff"));
 					}
@@ -110,12 +108,12 @@ namespace Laboratorio_1.Controllers
 			if (ArchivoEntrada != null)
 			{
 				string[] nombreArchivo = ArchivoEntrada.FileName.Split('.');
-
 				try
 				{
 					if (nombreArchivo[1] == "txt")
 					{
 						CompresionLZW H = new CompresionLZW();
+						CompresionHuffman H2 = new CompresionHuffman();
 
 						string path = Server.MapPath("~/ArchivosTmp/");
 						string pathPrueba = path + nombreArchivo[0];
@@ -125,23 +123,23 @@ namespace Laboratorio_1.Controllers
 						string pathMiFichero = Server.MapPath("~/ArchivoMisCompresiones/");
 						pathMiFichero = pathMiFichero + "FicheroMisCompresiones.txt";
 
-
 						H.Compresion(path, pathPrueba);
-						//H.SetMisCompresiones(path, pathPrueba, pathMiFichero);
+						H2.SetMisCompresiones(path, pathPrueba, pathMiFichero, "LZW");
 						ViewBag.Ok = "Proceso completado :)";
 						return File(pathPrueba, "lzw", (nombreArchivo[0] + ".lzw"));
 					}
 					else if (nombreArchivo[1] == "lzw")
 					{
-						//DescompresionHuffman H = new DescompresionHuffman();
-						//string path = Server.MapPath("~/ArchivosTmp/");
-						//string pathPrueba = path + nombreArchivo[0];
-						//path = path + ArchivoEntrada.FileName;
-						//ArchivoEntrada.SaveAs(path);
+						DescompresionLZW H = new DescompresionLZW();
 
-						//H.Descompresion(pathPrueba, path);
-						//ViewBag.ok = "Proceso completado :)";
-						//return File(pathPrueba, "txt", (nombreArchivo[0] + ".txt"));
+						string path = Server.MapPath("~/ArchivosTmp/");
+						string pathPrueba = path + nombreArchivo[0];
+						path = path + ArchivoEntrada.FileName;
+						ArchivoEntrada.SaveAs(path);
+
+						H.Descompresion(pathPrueba, path);
+						ViewBag.ok = "Proceso completado :)";
+						return File(pathPrueba, "txt", (nombreArchivo[0] + ".txt"));
 					}
 				}
 				catch

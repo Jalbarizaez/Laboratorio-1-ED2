@@ -9,18 +9,18 @@ namespace Laboratorio_1.Models
 {
 	public class CompresionLZW
 	{
-	    public void Compresion(string pathLectura, string pathEscritura)
+		private Dictionary<string, int> Tabla_Caracteres = new Dictionary<string, int>();
+		private Dictionary<string, int> Tabla_Escritura = new Dictionary<string, int>();
+		private const int bufferLenght = 500;
+		int cantidad_bits { get; set; }
+
+		public void Compresion(string pathLectura, string pathEscritura)
         { 
             Diccionario_Inicial(pathLectura);
             Cantidad_Bits(pathLectura);
             Escribir_Diccionario(pathEscritura);
             Diccionario_Completo(pathLectura, pathEscritura);
         }
-
-        private Dictionary<string, int> Tabla_Caracteres = new Dictionary<string, int>();
-        private Dictionary<string, int> Tabla_Escritura = new Dictionary<string, int>();
-        private const int bufferLenght = 500;
-        int cantidad_bits { get; set; }
 
         private void Cantidad_Bits(string pathLectura)
         {
@@ -30,7 +30,6 @@ namespace Laboratorio_1.Models
             {
                 using (var reader = new BinaryReader(file))
                 {
-
                     while (reader.BaseStream.Position != reader.BaseStream.Length)
                     {
                         buffer = reader.ReadBytes(bufferLenght);
@@ -41,24 +40,21 @@ namespace Laboratorio_1.Models
                             {
                                 Tabla_Caracteres.Add(UltimoCaracter + bytes, (Tabla_Caracteres.Count + 1));
                                 UltimoCaracter = bytes;
-
                             }
-
                             else
                             {
                                 UltimoCaracter += bytes;
                             }
                         }
-
                     }
                     var numero = Tabla_Caracteres.Values.Max();
                     var bits = Convert.ToString(numero, 2);
                     cantidad_bits = bits.Length;
-
                 }
             }
         }
-            private void Diccionario_Inicial(string pathLectura)
+
+        private void Diccionario_Inicial(string pathLectura)
         {
             var buffer = new byte[bufferLenght];
             //Se llena el diccionario con los valores iniciales
@@ -89,17 +85,13 @@ namespace Laboratorio_1.Models
                         }
                     }
                 }
-
             }
-
-            //Escribir aqui el diccionario al archivo
         }
 
         private void Escribir_Diccionario(string pathEscritura)
         {
             char separador = '|';
             var escritura = new byte[bufferLenght];
-
 			if (Tabla_Caracteres.Keys.Contains("|"))
 			{
 				separador = 'ÿ';
@@ -108,7 +100,6 @@ namespace Laboratorio_1.Models
 					separador = 'ß';
 				}
 			}
-
             using (var file = new FileStream(pathEscritura, FileMode.OpenOrCreate))
             {
                 using (var writer = new BinaryWriter(file))
@@ -128,11 +119,10 @@ namespace Laboratorio_1.Models
                     }
                     writer.Write(Convert.ToByte(separador));
                 }
-
             }
-
         }
-        private void Diccionario_Completo(string pathLectura, string pathEscritura)
+
+		private void Diccionario_Completo(string pathLectura, string pathEscritura)
         {
             var escritura = new List<byte>();
             string recorrido = "";
@@ -142,20 +132,16 @@ namespace Laboratorio_1.Models
             int i = 0;
             using (var writer = new FileStream(pathEscritura, FileMode.Append))
             {
-
                 using (var file = new FileStream(pathLectura, FileMode.Open))
                 {
                     using (var reader = new BinaryReader(file))
                     {
                         while (reader.BaseStream.Position != reader.BaseStream.Length)
                         {
-                            // var escritura = new byte[bufferLenght];
                             buffer = reader.ReadBytes(bufferLenght);
                             foreach (var item in buffer)
                             {
-
                                 var bytes = Convert.ToString(Convert.ToChar(item));
-
                                 if (!Tabla_Escritura.ContainsKey((UltimoCaracter + bytes)))
                                 {
                                     Tabla_Escritura.Add(UltimoCaracter + bytes, (Tabla_Escritura.Count + 1));
@@ -176,7 +162,6 @@ namespace Laboratorio_1.Models
                                     UltimoCaracter = bytes;
                                     // agrega el numero                                         
                                 }
-
                                 else
                                 {
                                     UltimoCaracter += bytes;
@@ -205,15 +190,11 @@ namespace Laboratorio_1.Models
                                 recorrido += "0";
                             }
                             escribir.Add(Convert.ToByte(recorrido, 2));
-
                         }
                         writer.Write(escribir.ToArray(), 0, escribir.ToArray().Length);
-                        //resultado.Add(Tabla_Escritura[UltimoCaracter]);
                     }
-                }
-                
+                }      
             }
         }
     }
-
 }

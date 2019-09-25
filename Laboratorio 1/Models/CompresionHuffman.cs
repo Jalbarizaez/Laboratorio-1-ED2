@@ -180,7 +180,7 @@ namespace Laboratorio_1.Models
             }
         }
 
-		public void SetMisCompresiones(string pathLectura, string pathEscritura, string pathMiFichero)
+		public void SetMisCompresiones(string pathLectura, string pathEscritura, string pathMiFichero, string TipoCompresion)
 		{
 			FileInfo ArchivoOriginal = new FileInfo(pathLectura);
 			string nombre = ArchivoOriginal.Name;
@@ -195,7 +195,7 @@ namespace Laboratorio_1.Models
 
 			using (StreamWriter Writer = File.AppendText(pathMiFichero))
 			{
-				Writer.WriteLine(nombre + "," + RazonDeCompresion + "," + FactorDeCompresion + "," + PorcentajeDeReduccion + "," + "Huffman");
+				Writer.WriteLine(nombre + "," + RazonDeCompresion + "," + FactorDeCompresion + "," + PorcentajeDeReduccion + "," + TipoCompresion);
 			}
 		}
 

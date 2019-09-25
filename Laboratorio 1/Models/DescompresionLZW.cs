@@ -12,18 +12,14 @@ namespace Laboratorio_1.Models
         private const int bufferLenght = 750;
         int cantidad_bits { get; set; }
         private static char separa = new char();
-        public void Descompresion()
+
+		public void Descompresion(string pathEscritura, string pathLectura)
         {
-            DiccionarioLzw("C:/Users/jealb/OneDrive/Escritorio/Prueba.huff");
-
-
-
-
+            DiccionarioLzw(pathLectura);
         }
-        public void DiccionarioLzw(string path)
+
+		public void DiccionarioLzw(string path)
         {
-
-
             using (var File = new FileStream(path, FileMode.Open))
             {
                 byte bit = new byte();
@@ -78,12 +74,12 @@ namespace Laboratorio_1.Models
                                 }
                                 else { frecuencia += charr.ToString(); }
                             }
-
                         }
                     }
                 }
                 cantidad_bits = Convert.ToInt32(cantidad_datos);
             }
+			var x = Tabla_Caracteres;
         }
     }
 }
