@@ -109,7 +109,7 @@ namespace Laboratorio_1.Models
                     writer.Write(Convert.ToByte(separador));
 
                     //Escribe el caracter junto con su Frecuencia
-                    foreach (KeyValuePair<string, int> Valores in Tabla_Caracteres)
+                    foreach (KeyValuePair<string, int> Valores in Tabla_Escritura)
                     {
                         escritura = Encoding.UTF8.GetBytes(Valores.Key.ToString().ToArray());//+ Valores.Value.ToString() + "|");
                         writer.Write(escritura);
