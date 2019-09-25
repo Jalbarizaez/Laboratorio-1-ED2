@@ -26,8 +26,6 @@ namespace Laboratorio_1.Models
         }
         static void ArbolHuffman(string path)
         {
-
-
             using (var File = new FileStream(path, FileMode.Open))
             {
                 int separador = 0;
