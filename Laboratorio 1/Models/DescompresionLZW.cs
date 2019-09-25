@@ -127,18 +127,20 @@ namespace Laboratorio_1.Models
                                                 //i++;
                                                 //Junta el codigo prefico en grupos de 8 en 8
                                                 recorrido = recorrido.Remove(0, cantidad_bits);
-                                                //if (!Tabla_Caracteres.ContainsValue((c)))
-                                                //{
-                                                //    previo = actual;
-                                                //    actual = Tabla_Caracteres[convertir];
+                                                if (Tabla_Caracteres.ContainsKey((convertir)))
+                                                {
+                                                    previo = actual;
+                                                    actual = Tabla_Caracteres[convertir];
+                                                    nuevo = previo + actual.Substring(0, 1);
+                                                    if (!Tabla_Caracteres.ContainsValue((nuevo)))
 
-                                                //    writer.Write(Encoding.UTF8.GetBytes(Tabla_Caracteres[convertir]));
-                                                //}
+                                                    {
+                                                        Tabla_Caracteres.Add(Tabla_Caracteres.Count + 1, nuevo);
+                                                    }
+                                                    writer.Write(Encoding.UTF8.GetBytes(actual));
+                                                }
 
-                                                //else
-                                                //{
 
-                                                //}
 
 
 
@@ -159,5 +161,6 @@ namespace Laboratorio_1.Models
                 }
             }
         }
+
     }
 }
