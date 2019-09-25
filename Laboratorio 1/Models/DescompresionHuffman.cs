@@ -168,7 +168,7 @@ namespace Laboratorio_1.Models
                                         {
                                             validacion += comparacion[i];
                                             i++;
-                                            if (Tabla_Caracteres.Keys.Contains(validacion))
+                                            if (Tabla_Caracteres.Keys.Contains(validacion) || caracteres_escritos <= Cantidad_Datos)
                                             {
                                                 i = 0;
                                                 caracteres.Add(Tabla_Caracteres[validacion]);

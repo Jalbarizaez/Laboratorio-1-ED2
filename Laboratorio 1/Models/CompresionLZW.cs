@@ -9,54 +9,102 @@ namespace Laboratorio_1.Models
 {
 	public class CompresionLZW
 	{
-		private static Dictionary<string, int> Tabla_Caracteres { get; set; }
-		private const int bufferLenght = 500;
-
-		public void Compresion(string pathLectura, string pathEscritura)
-		{
-			Tabla_Caracteres = new Dictionary<string, int>();
+	    public void Compresion(string pathLectura, string pathEscritura)
+        { 
             Diccionario_Inicial(pathLectura);
+            Cantidad_Bits(pathLectura);
             Escribir_Diccionario(pathEscritura);
             Diccionario_Completo(pathLectura, pathEscritura);
         }
-		private void Diccionario_Inicial(string pathLectura)
-		{
-			var buffer = new char[bufferLenght];	
-			//Se llena el diccionario con los valores iniciales
-			using (var file = new FileStream(pathLectura, FileMode.Open))
-			{
-				using (var reader = new BinaryReader(file))
-				{
-					while (reader.BaseStream.Position != reader.BaseStream.Length)
-					{
-						buffer = reader.ReadChars(bufferLenght);
-						foreach (var item in buffer)
-						{
-							//13 /r  10 /n
-							if (!Tabla_Caracteres.ContainsKey(Convert.ToString(item)) && Convert.ToInt16(item) != 13)
-							{
-								if (Tabla_Caracteres.Count() == 0)
-									Tabla_Caracteres.Add(Convert.ToString(item), 1);
-								else
-									Tabla_Caracteres.Add(Convert.ToString(item), (Tabla_Caracteres.Count + 1));
-							}
-						}
-					}
-				}
-			}
-			//Escribir aqui el diccionario al archivo
-		}
+        private Dictionary<string, int> Tabla_Caracteres = new Dictionary<string, int>();
+        private Dictionary<string, int> Tabla_Escritura = new Dictionary<string, int>();
+        private const int bufferLenght = 500;
+        int cantidad_bits { get; set; }
+
+        private void Cantidad_Bits(string pathLectura)
+        {
+            var buffer = new byte[bufferLenght];
+            string UltimoCaracter = "";
+            using (var file = new FileStream(pathLectura, FileMode.Open))
+            {
+                using (var reader = new BinaryReader(file))
+                {
+
+                    while (reader.BaseStream.Position != reader.BaseStream.Length)
+                    {
+                        buffer = reader.ReadBytes(bufferLenght);
+                        foreach (var item in buffer)
+                        {
+                            var bytes = Convert.ToString(Convert.ToChar(item));
+                            if (!Tabla_Caracteres.ContainsKey((UltimoCaracter + bytes)))
+                            {
+                                Tabla_Caracteres.Add(UltimoCaracter + bytes, (Tabla_Caracteres.Count + 1));
+                                UltimoCaracter = bytes;
+
+                            }
+
+                            else
+                            {
+                                UltimoCaracter += bytes;
+                            }
+                        }
+
+                    }
+                    var numero = Tabla_Caracteres.Values.Max();
+                    var bits = Convert.ToString(numero, 2);
+                    cantidad_bits = bits.Length;
+
+                }
+            }
+            //Escribir aca todo los numero en bytes al archivo de escritura
+        }
+        private void Diccionario_Inicial(string pathLectura)
+        {
+            var buffer = new byte[bufferLenght];
+            //Se llena el diccionario con los valores iniciales
+            using (var file = new FileStream(pathLectura, FileMode.Open))
+            {
+                using (var reader = new BinaryReader(file))
+                {
+                    while (reader.BaseStream.Position != reader.BaseStream.Length)
+                    {
+                        buffer = reader.ReadBytes(bufferLenght);
+                        foreach (var item in buffer)
+                        {
+                            var bytes = Convert.ToString(Convert.ToChar(item));
+                            //13 /r  10 /n
+                            if (!Tabla_Caracteres.ContainsKey(bytes) /*&& Convert.ToInt16(Convert.ToChar(item)) != 13*/)
+                            {
+                                if (Tabla_Caracteres.Count() == 0)
+                                {
+                                    Tabla_Caracteres.Add(bytes, 1);
+                                    Tabla_Escritura.Add(bytes, 1);
+                                }
+                                else
+                                {
+                                    Tabla_Caracteres.Add(bytes, (Tabla_Caracteres.Count + 1));
+                                    Tabla_Escritura.Add(bytes, (Tabla_Escritura.Count + 1));
+                                }
+                            }
+                        }
+                    }
+                }
+
+            }
+
+            //Escribir aqui el diccionario al archivo
+        }
         private void Escribir_Diccionario(string pathEscritura)
         {
-            string separador = "";
+            char separador = '|';
             var escritura = new byte[bufferLenght];
-            separador = "|";
+
             if (Tabla_Caracteres.Keys.Contains("|"))
             {
-                separador = "ÿ";
+                separador = 'ÿ';
                 if (Tabla_Caracteres.Keys.Contains("ÿ"))
                 {
-                    separador = "ß";
+                    separador = 'ß';
                 }
             }
 
@@ -65,6 +113,7 @@ namespace Laboratorio_1.Models
                 using (var writer = new BinaryWriter(file))
                 {
 
+
                     //Escribe el caracter junto con su Frecuencia
                     foreach (KeyValuePair<string, int> Valores in Tabla_Caracteres)
                     {
@@ -72,44 +121,49 @@ namespace Laboratorio_1.Models
                         writer.Write(escritura);
                         escritura = Encoding.UTF8.GetBytes(Valores.Value.ToString().ToArray());//+ Valores.Value.ToString() + "|");
                         writer.Write(escritura);
-                        writer.Write(Convert.ToByte(Convert.ToChar(separador)));
+                        writer.Write(Convert.ToByte(separador));
                     }
-                    writer.Write(Convert.ToByte(Convert.ToChar(separador)));
+                    writer.Write(Convert.ToByte(separador));
                 }
 
             }
 
         }
         private void Diccionario_Completo(string pathLectura, string pathEscritura)
-		{
-			var buffer = new byte[bufferLenght];
-			var resultado = new List<int>();
-			string UltimoCaracter = "";
-			using (var file = new FileStream(pathLectura, FileMode.Open))
-			{
-				using (var reader = new BinaryReader(file))
-				{
-					while (reader.BaseStream.Position != reader.BaseStream.Length)
-					{
-						buffer = reader.ReadBytes(bufferLenght);
-						foreach (var item in buffer)
-						{
-							if (!Tabla_Caracteres.ContainsKey((UltimoCaracter + Convert.ToString(Convert.ToChar(item)))))
-							{
-								Tabla_Caracteres.Add((UltimoCaracter + Convert.ToString(Convert.ToChar(item))), (Tabla_Caracteres.Count + 1));
-								resultado.Add(Tabla_Caracteres[(UltimoCaracter + Convert.ToString(Convert.ToChar(item))).Substring(0, ((UltimoCaracter + Convert.ToString(Convert.ToChar(item))).Length - 1))]);
-								UltimoCaracter = (UltimoCaracter + Convert.ToString(Convert.ToChar(item))).Substring(((UltimoCaracter + Convert.ToString(Convert.ToChar(item))).Length - 1), 1);
-							}
-							else
-							{
-								UltimoCaracter = (UltimoCaracter + Convert.ToString(Convert.ToChar(item)));
-							}
-						}
-						resultado.Add(Tabla_Caracteres[UltimoCaracter]);
-					}
-				}
-			}
-			//Escribir aca todo los numero en bytes al archivo de escritura
-		}
-	}
+        {
+            var buffer = new byte[bufferLenght];
+            var resultado = new List<int>();
+            string UltimoCaracter = "";
+            using (var file = new FileStream(pathLectura, FileMode.Open))
+            {
+                using (var reader = new BinaryReader(file))
+                {
+                    while (reader.BaseStream.Position != reader.BaseStream.Length)
+                    {
+                        buffer = reader.ReadBytes(bufferLenght);
+                        foreach (var item in buffer)
+                        {
+
+                            var bytes = Convert.ToString(Convert.ToChar(item));
+
+                            if (!Tabla_Escritura.ContainsKey((UltimoCaracter + bytes)))
+                            {
+                                Tabla_Escritura.Add(UltimoCaracter + bytes, (Tabla_Escritura.Count + 1));
+                                resultado.Add(Tabla_Escritura[UltimoCaracter]);
+                                UltimoCaracter = bytes;
+                                // agrega el numero                                         
+                            }
+
+                            else
+                            {
+                                UltimoCaracter += bytes;
+                            }
+                        }
+                        resultado.Add(Tabla_Escritura[UltimoCaracter]);
+                    }
+                }
+            }
+            //Escribir aca todo los numero en bytes al archivo de escritura
+        }
+    }
 }
