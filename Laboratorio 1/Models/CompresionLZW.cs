@@ -57,9 +57,8 @@ namespace Laboratorio_1.Models
 
                 }
             }
-            //Escribir aca todo los numero en bytes al archivo de escritura
         }
-        private void Diccionario_Inicial(string pathLectura)
+            private void Diccionario_Inicial(string pathLectura)
         {
             var buffer = new byte[bufferLenght];
             //Se llena el diccionario con los valores iniciales
@@ -114,7 +113,9 @@ namespace Laboratorio_1.Models
             {
                 using (var writer = new BinaryWriter(file))
                 {
-
+                    escritura = Encoding.UTF8.GetBytes(cantidad_bits.ToString().ToArray());
+                    writer.Write(escritura);
+                    writer.Write(Convert.ToByte(separador));
 
                     //Escribe el caracter junto con su Frecuencia
                     foreach (KeyValuePair<string, int> Valores in Tabla_Caracteres)
@@ -132,41 +133,86 @@ namespace Laboratorio_1.Models
 
         }
         private void Diccionario_Completo(string pathLectura, string pathEscritura)
-
         {
+            var escritura = new List<byte>();
+            string recorrido = "";
             var buffer = new byte[bufferLenght];
             var resultado = new List<int>();
             string UltimoCaracter = "";
-            using (var file = new FileStream(pathLectura, FileMode.Open))
+            int i = 0;
+            using (var writer = new FileStream(pathEscritura, FileMode.Append))
             {
-                using (var reader = new BinaryReader(file))
+
+                using (var file = new FileStream(pathLectura, FileMode.Open))
                 {
-                    while (reader.BaseStream.Position != reader.BaseStream.Length)
+                    using (var reader = new BinaryReader(file))
                     {
-                        buffer = reader.ReadBytes(bufferLenght);
-                        foreach (var item in buffer)
+                        while (reader.BaseStream.Position != reader.BaseStream.Length)
                         {
-
-                            var bytes = Convert.ToString(Convert.ToChar(item));
-
-                            if (!Tabla_Escritura.ContainsKey((UltimoCaracter + bytes)))
+                            // var escritura = new byte[bufferLenght];
+                            buffer = reader.ReadBytes(bufferLenght);
+                            foreach (var item in buffer)
                             {
-                                Tabla_Escritura.Add(UltimoCaracter + bytes, (Tabla_Escritura.Count + 1));
-                                resultado.Add(Tabla_Escritura[UltimoCaracter]);
-                                UltimoCaracter = bytes;
-                                // agrega el numero                                         
-                            }
 
-                            else
-                            {
-                                UltimoCaracter += bytes;
+                                var bytes = Convert.ToString(Convert.ToChar(item));
+
+                                if (!Tabla_Escritura.ContainsKey((UltimoCaracter + bytes)))
+                                {
+                                    Tabla_Escritura.Add(UltimoCaracter + bytes, (Tabla_Escritura.Count + 1));
+                                    //resultado.Add(Tabla_Escritura[UltimoCaracter]);
+                                    var bits = Convert.ToString(Tabla_Escritura[UltimoCaracter], 2);
+                                    var completo = bits.PadLeft(cantidad_bits, '0');
+                                    recorrido += completo;
+                                    if (recorrido.Length >= 8)
+                                    {
+                                        while (recorrido.Length > 8)
+                                        {
+                                            escritura.Add((Convert.ToByte(recorrido.Substring(0, 8), 2)));
+                                            //i++;
+                                            //Junta el codigo prefico en grupos de 8 en 8
+                                            recorrido = recorrido.Remove(0, 8);
+                                        }
+                                    }
+                                    UltimoCaracter = bytes;
+                                    // agrega el numero                                         
+                                }
+
+                                else
+                                {
+                                    UltimoCaracter += bytes;
+                                }
                             }
+                            //i = 0;
+                            writer.Write(escritura.ToArray(), 0, escritura.ToArray().Length);
+                            escritura.Clear();
+                            //resultado.Add(Tabla_Escritura[UltimoCaracter]);
                         }
-                        resultado.Add(Tabla_Escritura[UltimoCaracter]);
+                        var bit = Convert.ToString(Tabla_Escritura[UltimoCaracter], 2);
+                        var completar = bit.PadLeft(cantidad_bits, '0');
+                        recorrido += completar;
+                        List<byte> escribir = new List<byte>();
+                        while (recorrido.Length > 8)
+                        {
+                            escribir.Add(Convert.ToByte(recorrido.Substring(0, 8), 2));
+
+                            //Junta el codigo prefico en grupos de 8 en 8
+                            recorrido = recorrido.Remove(0, 8);
+                        }
+                        if (recorrido.Length != 0)
+                        {
+                            for (int j = 0; recorrido.Length < 8; j++)
+                            {
+                                recorrido += "0";
+                            }
+                            escribir.Add(Convert.ToByte(recorrido, 2));
+
+                        }
+                        writer.Write(escribir.ToArray(), 0, escribir.ToArray().Length);
+                        //resultado.Add(Tabla_Escritura[UltimoCaracter]);
                     }
                 }
+                
             }
-            //Escribir aca todo los numero en bytes al archivo de escritura
         }
     }
 
