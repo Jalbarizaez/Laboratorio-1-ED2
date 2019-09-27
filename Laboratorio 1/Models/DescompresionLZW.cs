@@ -6,19 +6,20 @@ using System.IO;
 
 namespace Laboratorio_1.Models
 {
-	public class DescompresionLZW
-	{
+    public class DescompresionLZW
+    {
         private Dictionary<string, int> Tabla_Caracteres = new Dictionary<string, int>();
         private const int bufferLenght = 750;
         int cantidad_bits { get; set; }
         private static char separa = new char();
 
-		public void Descompresion(string pathEscritura, string pathLectura)
+        public void Descompresion(string pathEscritura, string pathLectura)
         {
             DiccionarioLzw(pathLectura);
+            Escritura(pathLectura, pathEscritura);
         }
 
-		public void DiccionarioLzw(string path)
+        public void DiccionarioLzw(string path)
         {
             using (var File = new FileStream(path, FileMode.Open))
             {
@@ -79,10 +80,11 @@ namespace Laboratorio_1.Models
                 }
                 cantidad_bits = Convert.ToInt32(cantidad_datos);
             }
-			var x = Tabla_Caracteres;
+            var x = Tabla_Caracteres;
         }
         private void Escritura(string path_Lectura, string path_Escritura)
         {
+            var buffer = new byte[bufferLenght];
             string previo = "";
             string actual = "";
             string nuevo = "";
@@ -98,7 +100,7 @@ namespace Laboratorio_1.Models
                     using (var File = new FileStream(path_Lectura, FileMode.Open))
                     {
 
-                        var buffer = new byte[bufferLenght];
+
 
                         using (var reader = new BinaryReader(File))
                         {
@@ -113,6 +115,7 @@ namespace Laboratorio_1.Models
                                     else if (inicio == 1 && Convert.ToChar(item) == separa) { inicio = 2; }
                                     else if (inicio == 2)
                                     {
+
                                         //Inicia descomprecion
                                         var bits = Convert.ToString(item, 2);
                                         var completo = bits.PadLeft(8, '0');
@@ -137,7 +140,25 @@ namespace Laboratorio_1.Models
                                                     {
                                                         Tabla_Caracteres.Add(Tabla_Caracteres.Count + 1, nuevo);
                                                     }
-                                                    writer.Write(Encoding.UTF8.GetBytes(actual));
+                                                    writer.Write(Encoding.UTF8.GetBytes(actual.ToArray()));
+                                                }
+                                                else
+                                                {
+                                                    previo = actual;
+                                                    nuevo = previo + actual.Substring(0, 1);
+
+                                                    if (!Tabla_Caracteres.ContainsValue((nuevo)))
+
+                                                    {
+                                                        Tabla_Caracteres.Add(Tabla_Caracteres.Count + 1, nuevo);
+                                                    }
+                                                    if (convertir != 0)
+                                                    {
+                                                        actual = Tabla_Caracteres[convertir];
+                                                    }
+
+                                                    writer.Write(Encoding.UTF8.GetBytes(actual.ToArray()));
+
                                                 }
 
 
@@ -161,6 +182,5 @@ namespace Laboratorio_1.Models
                 }
             }
         }
-
     }
 }

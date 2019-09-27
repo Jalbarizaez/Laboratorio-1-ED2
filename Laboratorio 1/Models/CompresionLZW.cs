@@ -11,7 +11,8 @@ namespace Laboratorio_1.Models
 	{
 		private Dictionary<string, int> Tabla_Caracteres = new Dictionary<string, int>();
 		private Dictionary<string, int> Tabla_Escritura = new Dictionary<string, int>();
-		private const int bufferLenght = 500;
+        private Dictionary<byte, int> Tabla_bytes = new Dictionary<byte, int>();
+        private const int bufferLenght = 500;
 		int cantidad_bits { get; set; }
 
 		public void Compresion(string pathLectura, string pathEscritura)
@@ -54,8 +55,9 @@ namespace Laboratorio_1.Models
             }
         }
 
-        private void Diccionario_Inicial(string pathLectura)
+        private void Diccionario_Inicial(string pathLectura, string pathEscritura)
         {
+
             var buffer = new byte[bufferLenght];
             //Se llena el diccionario con los valores iniciales
             using (var file = new FileStream(pathLectura, FileMode.Open))
@@ -71,14 +73,17 @@ namespace Laboratorio_1.Models
                             //13 /r  10 /n
                             if (!Tabla_Caracteres.ContainsKey(bytes) /*&& Convert.ToInt16(Convert.ToChar(item)) != 13*/)
                             {
+
                                 if (Tabla_Caracteres.Count() == 0)
                                 {
                                     Tabla_Caracteres.Add(bytes, 1);
+                                    Tabla_bytes.Add(item, 1);
                                     Tabla_Escritura.Add(bytes, 1);
                                 }
                                 else
                                 {
                                     Tabla_Caracteres.Add(bytes, (Tabla_Caracteres.Count + 1));
+                                    Tabla_bytes.Add(item, (Tabla_bytes.Count + 1));
                                     Tabla_Escritura.Add(bytes, (Tabla_Escritura.Count + 1));
                                 }
                             }
@@ -86,20 +91,23 @@ namespace Laboratorio_1.Models
                     }
                 }
             }
+            //Escribir aqui el diccionario al archivo
         }
 
         private void Escribir_Diccionario(string pathEscritura)
         {
             char separador = '|';
             var escritura = new byte[bufferLenght];
-			if (Tabla_Caracteres.Keys.Contains("|"))
-			{
-				separador = 'ÿ';
-				if (Tabla_Caracteres.Keys.Contains("ÿ"))
-				{
-					separador = 'ß';
-				}
-			}
+
+            if (Tabla_Caracteres.Keys.Contains("|"))
+            {
+                separador = 'ÿ';
+                if (Tabla_Caracteres.Keys.Contains("ÿ"))
+                {
+                    separador = 'ß';
+                }
+            }
+
             using (var file = new FileStream(pathEscritura, FileMode.OpenOrCreate))
             {
                 using (var writer = new BinaryWriter(file))
@@ -107,22 +115,23 @@ namespace Laboratorio_1.Models
                     escritura = Encoding.UTF8.GetBytes(cantidad_bits.ToString().ToArray());
                     writer.Write(escritura);
                     writer.Write(Convert.ToByte(separador));
-
                     //Escribe el caracter junto con su Frecuencia
-                    foreach (KeyValuePair<string, int> Valores in Tabla_Escritura)
+                    foreach (KeyValuePair<byte, int> Valores in Tabla_bytes)
                     {
-                        escritura = Encoding.UTF8.GetBytes(Valores.Key.ToString().ToArray());//+ Valores.Value.ToString() + "|");
-                        writer.Write(escritura);
+                        //+ Valores.Value.ToString() + "|");
+                        writer.Write(Valores.Key);
                         escritura = Encoding.UTF8.GetBytes(Valores.Value.ToString().ToArray());//+ Valores.Value.ToString() + "|");
                         writer.Write(escritura);
                         writer.Write(Convert.ToByte(separador));
                     }
                     writer.Write(Convert.ToByte(separador));
                 }
+
             }
+
         }
 
-		private void Diccionario_Completo(string pathLectura, string pathEscritura)
+        private void Diccionario_Completo(string pathLectura, string pathEscritura)
         {
             var escritura = new List<byte>();
             string recorrido = "";
@@ -146,9 +155,9 @@ namespace Laboratorio_1.Models
                                 {
                                     Tabla_Escritura.Add(UltimoCaracter + bytes, (Tabla_Escritura.Count + 1));
                                     //resultado.Add(Tabla_Escritura[UltimoCaracter]);
-                                    var bits = Convert.ToString(Tabla_Escritura[UltimoCaracter], 2);
-                                    var completo = bits.PadLeft(cantidad_bits, '0');
-                                    recorrido += completo;
+                                    var bitss = Convert.ToString(Tabla_Escritura[UltimoCaracter], 2);
+                                    var completos = bitss.PadLeft(cantidad_bits, '0');
+                                    recorrido += completos;
                                     if (recorrido.Length >= 8)
                                     {
                                         while (recorrido.Length > 8)
@@ -173,8 +182,8 @@ namespace Laboratorio_1.Models
                             //resultado.Add(Tabla_Escritura[UltimoCaracter]);
                         }
                         var bit = Convert.ToString(Tabla_Escritura[UltimoCaracter], 2);
-                        var completar = bit.PadLeft(cantidad_bits, '0');
-                        recorrido += completar;
+                        var completo = bit.PadLeft(cantidad_bits, '0');
+                        recorrido += completo;
                         List<byte> escribir = new List<byte>();
                         while (recorrido.Length > 8)
                         {
@@ -193,8 +202,7 @@ namespace Laboratorio_1.Models
                         }
                         writer.Write(escribir.ToArray(), 0, escribir.ToArray().Length);
                     }
-                }      
+                }
             }
         }
     }
-}
