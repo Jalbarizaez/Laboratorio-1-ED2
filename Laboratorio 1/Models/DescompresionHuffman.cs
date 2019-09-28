@@ -126,7 +126,6 @@ namespace Laboratorio_1.Models
         }
         private static void Recorrido(string path_Lectura, string path_Escritura)
         {
-
             int caracteres_escritos = 0;
             int i = 0;
             string validacion = "";
@@ -166,7 +165,7 @@ namespace Laboratorio_1.Models
                                         {
                                             validacion += comparacion[i];
                                             i++;
-                                            if (Tabla_Caracteres.Keys.Contains(validacion) || caracteres_escritos <= Cantidad_Datos)
+                                            if (Tabla_Caracteres.Keys.Contains(validacion))
                                             {
                                                 i = 0;
                                                 caracteres.Add(Tabla_Caracteres[validacion]);
@@ -190,8 +189,6 @@ namespace Laboratorio_1.Models
                     }
                 }
             }
-
-
         }
     }
 
