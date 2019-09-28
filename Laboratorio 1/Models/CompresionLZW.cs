@@ -7,16 +7,16 @@ using System.Text;
 
 namespace Laboratorio_1.Models
 {
-	public class CompresionLZW
-	{
-		private Dictionary<string, int> Tabla_Caracteres = new Dictionary<string, int>();
-		private Dictionary<string, int> Tabla_Escritura = new Dictionary<string, int>();
+    public class CompresionLZW
+    {
+        private Dictionary<string, int> Tabla_Caracteres = new Dictionary<string, int>();
+        private Dictionary<string, int> Tabla_Escritura = new Dictionary<string, int>();
         private Dictionary<byte, int> Tabla_bytes = new Dictionary<byte, int>();
         private const int bufferLenght = 500;
-		int cantidad_bits { get; set; }
+        private int cantidad_bits { get; set; }
 
-		public void Compresion(string pathLectura, string pathEscritura)
-        { 
+        public void Compresion(string pathLectura, string pathEscritura)
+        {
             Diccionario_Inicial(pathLectura);
             Cantidad_Bits(pathLectura);
             Escribir_Diccionario(pathEscritura);
@@ -55,7 +55,7 @@ namespace Laboratorio_1.Models
             }
         }
 
-        private void Diccionario_Inicial(string pathLectura, string pathEscritura)
+        private void Diccionario_Inicial(string pathLectura)
         {
 
             var buffer = new byte[bufferLenght];
@@ -90,10 +90,11 @@ namespace Laboratorio_1.Models
                         }
                     }
                 }
+
             }
+
             //Escribir aqui el diccionario al archivo
         }
-
         private void Escribir_Diccionario(string pathEscritura)
         {
             char separador = '|';
@@ -130,7 +131,6 @@ namespace Laboratorio_1.Models
             }
 
         }
-
         private void Diccionario_Completo(string pathLectura, string pathEscritura)
         {
             var escritura = new List<byte>();
@@ -206,3 +206,4 @@ namespace Laboratorio_1.Models
             }
         }
     }
+}

@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.IO;
+using System.Text;
+
 
 namespace Laboratorio_1.Models
 {
     public class DescompresionLZW
     {
-        private Dictionary<string, int> Tabla_Caracteres = new Dictionary<string, int>();
+        private Dictionary<int, string> Tabla_Caracteres = new Dictionary<int, string>();
         private const int bufferLenght = 750;
         int cantidad_bits { get; set; }
         private static char separa = new char();
@@ -68,7 +70,7 @@ namespace Laboratorio_1.Models
                                 if (caracter == "") { caracter = charr.ToString(); bit = item; }
                                 else if (charr == separa && final == 0)
                                 {
-                                    Tabla_Caracteres.Add(Convert.ToChar(bit).ToString(), Convert.ToInt32(frecuencia));
+                                    Tabla_Caracteres.Add(Convert.ToInt32(frecuencia), Convert.ToChar(bit).ToString());
                                     caracter = "";
                                     frecuencia = "";
                                     final = 1;
